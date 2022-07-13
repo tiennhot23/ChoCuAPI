@@ -1,6 +1,8 @@
 const express = require('express')
 const cors = require('cors')
 
+const upload = require('./routers/upload')
+
 require('dotenv').config()
 
 const app = express()
@@ -19,14 +21,9 @@ function postTrimmer(req, res, next) {
 
 app.use(postTrimmer)
 
-const conn = require('./connection')
-
+app.use('/upload', upload)
 app.use('/', (req, res, next) => {
-  conn.query(`select * from "Province"`, null, (err, result) => {
-    if (err) res.json({err: err.message})
-    else res.json({result})
-  })
-  //   res.json({message: 'HELLO STRANGER'})
+  res.json({message: 'HELLO STRANGER'})
 })
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
