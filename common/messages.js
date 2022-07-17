@@ -4,6 +4,14 @@ module.exports = {
     district_required: 'Yêu cầu cung cấp tên quận/huyện',
     ward_required: 'Yêu cầu cung cấp tên phường/xã'
   },
+  otp: {
+    phone_required: 'Yêu cầu cung cấp số điện thoại',
+    otp_required: 'Yêu cầu cung cấp mã otp',
+    phone_invalid: 'Số điện thoại không phù hợp',
+    otp_invalid: 'Mã OTP không đúng định dạng',
+    otp_expired: 'Mã OTP không chính xác hoặc đã hết hiệu lực',
+    otp_verified: 'Xác thực OTP thành công'
+  },
   file: {
     not_exist: 'File không tồn tại',
     choose_file: 'Vui lòng chọn file'

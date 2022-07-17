@@ -1,7 +1,7 @@
 const express = require('express')
 const multer = require('multer')
 
-const message = require('../configs/messages')
+const {messages} = require('../common')
 const FileModule = require('../modules/FileModule')
 
 const router = express.Router()
@@ -18,7 +18,7 @@ router.post('/single', upload.any('file'), async (req, res, next) => {
     return res.status(400).json({
       status: 'fail',
       code: 400,
-      message: message.file.not_exist,
+      message: messages.file.not_exist,
       data: []
     })
   }

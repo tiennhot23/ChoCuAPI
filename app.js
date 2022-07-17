@@ -5,6 +5,7 @@ require('dotenv').config()
 
 const upload = require('./routers/upload')
 const location = require('./routers/location')
+const otpRouter = require('./routers/otp')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -46,6 +47,7 @@ const onGetResult = (data, req, res, next) => {
 }
 
 app.use('/location', location, onGetResult)
+app.use('/otp', otpRouter, onGetResult)
 app.use('/upload', upload)
 app.use('/', (req, res, next) => {
   res.json({message: 'HELLO STRANGER'})

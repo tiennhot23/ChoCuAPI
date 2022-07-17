@@ -1,7 +1,6 @@
 const bcrypt = require('bcrypt')
 
-const constants = require('../configs/constants')
-const message = require('../configs/messages')
+const {constants, messages} = require('../common')
 
 const encrypt = {}
 
@@ -11,7 +10,7 @@ encrypt.hashPassword = (req, res, next) => {
     return res.status(400).json({
       status: 'fail',
       code: 400,
-      message: message.encypt.password_required,
+      message: messages.encypt.password_required,
       data: null
     })
   }
