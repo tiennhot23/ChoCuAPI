@@ -1,4 +1,9 @@
 module.exports = {
+  location: {
+    province_required: 'Yêu cầu cung cấp tên tỉnh/thành phố',
+    district_required: 'Yêu cầu cung cấp tên quận/huyện',
+    ward_required: 'Yêu cầu cung cấp tên phường/xã'
+  },
   file: {
     not_exist: 'File không tồn tại',
     choose_file: 'Vui lòng chọn file'
