@@ -5,7 +5,9 @@ require('dotenv').config()
 
 const upload = require('./routers/upload')
 const location = require('./routers/location')
-const otpRouter = require('./routers/otp')
+const otp = require('./routers/otp')
+const user = require('./routers/user')
+const response = require('./routers/response')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -23,31 +25,9 @@ function postTrimmer(req, res, next) {
 
 app.use(postTrimmer)
 
-const onGetResult = (data, req, res, next) => {
-  if (data instanceof Error) {
-    res.json({
-      status: 'fail',
-      code: data.code,
-      message: data.message || '',
-      data: []
-    })
-  } else {
-    data.status = 'success'
-    data.code = 200
-    data.message = data.message || ''
-    if (data.page) {
-      res.json({
-        ...data,
-        page: Number(page)
-      })
-    } else {
-      res.json(data)
-    }
-  }
-}
-
-app.use('/location', location, onGetResult)
-app.use('/otp', otpRouter, onGetResult)
+app.use('/location', location, response)
+app.use('/otp', otp, response)
+app.use('/user', user, response)
 app.use('/upload', upload)
 app.use('/', (req, res, next) => {
   res.json({message: 'HELLO STRANGER'})

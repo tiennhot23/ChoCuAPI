@@ -172,6 +172,12 @@ module.exports = {
   isValidOTP: (otp) => {
     const regexOTP = /[0-9]{6}$/
     return regexOTP.test(otp)
+  },
+
+  isValidPassword: (password) => {
+    /**Minimum eight characters, at least one letter, one number and one special character */
+    const regexPassword = /^(?=.{10,}$)(?=.*[A-Za-z])(?=.*[0-9])(?=.*\W).*$/
+    return regexPassword.test(password)
   }
 
   /* convert */

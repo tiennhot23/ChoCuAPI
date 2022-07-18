@@ -17,6 +17,12 @@ module.exports = {
     choose_file: 'Vui lòng chọn file'
   },
   user: {
+    phone_required: 'Yêu cầu cung cấp số điện thoại',
+    phone_invalid: 'Số điện thoại không phù hợp',
+    password_required: 'Yêu cầu cung cấp mật khẩu',
+    password_invalid:
+      'Mật khẩu phải ít nhất 8 ký tự, một chữ cái, một số và một ký tự đặc biệt',
+
     login_success: 'Đăng nhập thành công',
     add_success: 'Thêm thành công',
     update_success: 'Cập nhật thành công',
@@ -65,7 +71,14 @@ module.exports = {
     token_expired: 'Token này đã hết hạn sử dụng',
     token_invalid: 'Token không khả dụng'
   },
-  encypt: {
+  encrypt: {
     password_required: 'Yêu cầu password'
+  },
+  constraint: {
+    username_unique: 'Tên đăng nhập/số điên thoại đã tồn tại',
+    account_role_fk: 'Không tìm thấy quyền tài khoản này'
+  },
+  common: {
+    something_wrong: 'Lỗi không xác định'
   }
 }
