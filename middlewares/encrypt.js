@@ -1,28 +1,21 @@
 const bcrypt = require('bcrypt')
 
-const {constants, messages} = require('../common')
+const {constants, messages, helper} = require('../common')
+const {BadRequest} = require('../utils/Errors')
 
 const encrypt = {}
 
 encrypt.hashPassword = (req, res, next) => {
-  var pwd = req.body.password
-  if (!pwd || pwd.trim().length == 0) {
-    return res.status(400).json({
-      status: 'fail',
-      code: 400,
-      message: messages.encypt.password_required,
-      data: null
-    })
-  }
+  var password = req.body.password
+
   try {
-    req.body.password = bcrypt.hashSync(pwd, constants.saltRounds)
-  } catch (err) {
-    return res.status(500).json({
-      status: 'fail',
-      code: 500,
-      message: err.message,
-      data: null
-    })
+    if (!password || password.trim().length == 0)
+      throw new BadRequest(messages.encrypt.password_required)
+    if (!helper.isValidPassword(password))
+      throw new BadRequest(messages.user.password_invalid)
+    req.body.password = bcrypt.hashSync(password, constants.saltRounds)
+  } catch (e) {
+    next(e)
   }
 
   next()

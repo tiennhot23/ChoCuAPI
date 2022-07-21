@@ -3,27 +3,37 @@ const conn = require('../connection')
 
 const otp = {}
 
+/**
+ *
+ * @param {*} phone
+ * @returns object otp
+ */
 otp.getOTP = (phone) => {
   return new Promise((resolve, reject) => {
-    let query = `select * from "OTP" where phone = $1`
+    let query = `select * from "OTP" where phone = $1 limit 1`
 
     var params = [phone]
 
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)
-      else return resolve(res.rows)
+      else return resolve(res.rows[0])
     })
   })
 }
 
+/**
+ *
+ * @param {*} phone
+ * @returns otp_code, time_expired
+ */
 otp.createOTP = (phone) => {
   let otp_code = utils.getRandomInt(100000, 999999)
+  let verify_code = utils.getRandomInt(100000, 999999)
   let time_expired = utils.addMinutes(3)
   return new Promise((resolve, reject) => {
-    let query = `insert into "OTP" (phone, otp_code, time_expired) 
-        values ($1, $2, $3) returning *`
+    let query = `insert into "OTP" (phone, otp_code, time_expired, verified, verify_code) values ($1, $2, $3, $4, $5) returning otp_code, time_expired`
 
-    var params = [phone, otp_code, time_expired]
+    var params = [phone, otp_code, time_expired, false, verify_code]
 
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)
@@ -32,14 +42,19 @@ otp.createOTP = (phone) => {
   })
 }
 
-otp.updateOTP = (phone) => {
+/**
+ *
+ * @param {*} phone
+ * @returns otp_code, time_expired
+ */
+otp.resetOTP = (phone) => {
   let otp_code = utils.getRandomInt(100000, 999999)
+  let verify_code = utils.getRandomInt(100000, 999999)
   let time_expired = utils.addMinutes(3)
   return new Promise((resolve, reject) => {
-    let query = `update "OTP" set (otp_code, time_expired) 
-        values ($2, $3) where phone = $1 returning *`
+    let query = `update "OTP" set otp_code=$2, time_expired=$3, verified=$4, verify_code=$5 where phone = $1 returning otp_code, time_expired`
 
-    var params = [phone, otp_code, time_expired]
+    var params = [phone, otp_code, time_expired, false, verify_code]
 
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)
@@ -48,35 +63,26 @@ otp.updateOTP = (phone) => {
   })
 }
 
-otp.verifyOTP = (phone, otp_code) => {
+/**
+ *
+ * @param {*} phone
+ * @returns verify_code
+ */
+otp.verifyOTP = (phone) => {
   return new Promise((resolve, reject) => {
-    let query = `select time_expired from "OTP" where phone = $1 and otp_code = $2`
-
-    var params = [phone, otp_code]
-
-    conn.query(query, params, (err, res) => {
+    let query = `update "OTP" set verified=true where phone = $1 returning verify_code`
+    conn.query(query, [phone], (err, res) => {
       if (err) return reject(err)
-      else {
-        if (res && res.rows.length > 0) {
-          let {time_expired} = res.rows[0]
-
-          console.log('VERIFY_OTP', {
-            time_expired,
-            current_time: new Date().toISOString(),
-            isExpired: time_expired < new Date()
-          })
-
-          if (time_expired >= new Date()) {
-            return resolve(true)
-          } else return resolve(false)
-        } else {
-          return resolve(false)
-        }
-      }
+      else return resolve(res.rows)
     })
   })
 }
 
+/**
+ *
+ * @param {*} phone
+ * @returns true or false
+ */
 otp.deleteOTP = (phone) => {
   return new Promise((resolve, reject) => {
     let query = `delete from "OTP" where phone = $1`

@@ -10,7 +10,8 @@ module.exports = {
     phone_invalid: 'Số điện thoại không phù hợp',
     otp_invalid: 'Mã OTP không đúng định dạng',
     otp_expired: 'Mã OTP không chính xác hoặc đã hết hiệu lực',
-    otp_verified: 'Xác thực OTP thành công'
+    otp_verified: 'Xác thực OTP thành công',
+    otp_created: 'Tạo mã OTP thành công'
   },
   file: {
     not_exist: 'File không tồn tại',
@@ -22,6 +23,8 @@ module.exports = {
     password_required: 'Yêu cầu cung cấp mật khẩu',
     password_invalid:
       'Mật khẩu phải ít nhất 8 ký tự, một chữ cái, một số và một ký tự đặc biệt',
+    create_account_failed: 'Xảy ra lỗi không thể tạo tài khoản',
+    create_account_success: 'Tạo tài khoản thành công',
 
     login_success: 'Đăng nhập thành công',
     add_success: 'Thêm thành công',

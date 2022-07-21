@@ -24,7 +24,7 @@ userModule.createUser = ({account_id, phone}) => {
 
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)
-      else return resolve(true)
+      else return resolve([])
     })
   })
 }

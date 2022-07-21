@@ -7,7 +7,8 @@ const upload = require('./routers/upload')
 const location = require('./routers/location')
 const otp = require('./routers/otp')
 const user = require('./routers/user')
-const response = require('./routers/response')
+const errorHandling = require('./middlewares/errorHandling')
+const responseHandling = require('./middlewares/responseHandling')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -25,12 +26,16 @@ function postTrimmer(req, res, next) {
 
 app.use(postTrimmer)
 
-app.use('/location', location, response)
-app.use('/otp', otp, response)
-app.use('/user', user, response)
+app.use(responseHandling)
+
+app.use('/location', location)
+app.use('/otp', otp)
+app.use('/user', user)
 app.use('/upload', upload)
 app.use('/', (req, res, next) => {
   res.json({message: 'HELLO STRANGER'})
 })
+
+app.use(errorHandling)
 
 app.listen(port, () => console.log(`Listening on port ${port}`))

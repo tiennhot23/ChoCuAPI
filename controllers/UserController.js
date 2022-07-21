@@ -1,26 +1,26 @@
 const {helper, utils, messages} = require('../common')
-const {Err, Response} = require('../models')
-const userModule = require('../modules/UserModule')
+const {otpModule, userModule} = require('../modules')
+const {BadRequest, GeneralError} = require('../utils/Errors')
 
 const userController = {}
 
 userController.createAccount = async (req, res, next) => {
   let {phone, password} = req.body
   try {
-    if (!phone) return next(new Err(messages.user.phone_required, 400, null))
+    if (!phone) throw new BadRequest(messages.user.phone_required)
     if (!helper.isValidatePhone(phone))
-      return next(new Err(messages.user.phone_invalid, 400, null))
-    if (!password)
-      return next(new Err(messages.user.missing_password, 400, null))
-    if (!helper.isValidPassword(password))
-      return next(new Err(messages.user.password_invalid, 400, null))
+      throw new BadRequest(messages.user.phone_invalid)
 
     let {account_id} = await userModule.createAccount({phone, password})
-    if (account_id)
-      next({data: await userModule.createUser({account_id, phone})})
-    else next(new Err(messages.common.something_wrong), 500, null)
+    if (account_id) {
+      await otpModule.deleteOTP(phone)
+      res.success({
+        message: messages.user.create_account_success,
+        data: await userModule.createUser({account_id, phone})
+      })
+    } else throw new GeneralError(messages.user.create_account_failed)
   } catch (e) {
-    next(new Err(e.message, 500, e.constraint))
+    next(e)
   }
 }
 
