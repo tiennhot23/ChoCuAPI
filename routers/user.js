@@ -14,6 +14,8 @@ user.post(
 
 user.post('/login', userController.login)
 
+user.post('/logout', auth.verifyUser, userController.logout)
+
 user.put('/update-info', auth.verifyUser, userController.updateInfo)
 
 module.exports = user

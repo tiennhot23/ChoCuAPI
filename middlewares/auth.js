@@ -24,7 +24,7 @@ auth.verifyUser = (req, res, next) => {
         if ((await UserModule.getUserInfo({user_id})).role_id !== role.customer)
           throw new Forbidden()
 
-        req.user = {user_id, account_id}
+        req.user = {user_id, account_id, access_token}
         next()
       } catch (e) {
         next(e)
@@ -52,7 +52,7 @@ auth.verifyAdmin = (req, res, next) => {
         if ((await UserModule.getUserInfo({user_id})).role_id !== role.admin)
           throw new Forbidden()
 
-        req.user = {user_id, account_id}
+        req.user = {user_id, account_id, access_token}
         next()
       } catch (e) {
         next(e)

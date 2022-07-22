@@ -118,10 +118,22 @@ userModule.login = ({username, password}) => {
   })
 }
 
-userModule.addAccessToken = ({account_id, access_token}) => {
+userModule.addAccountToken = ({account_id, access_token, fcm_token}) => {
   return new Promise((resolve, reject) => {
-    let query = `update "Account" set access_tokens=array_append(access_tokens, $2) where account_id=$1 returning account_id`
-    let params = [account_id, access_token]
+    let query = `update "Account" set access_tokens=array_append(access_tokens, $2), fcm_tokens=array_append(fcm_tokens, $3) where account_id=$1 returning account_id`
+    let params = [account_id, access_token, fcm_token]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows[0])
+    })
+  })
+}
+
+userModule.removeAccountToken = ({account_id, access_token, fcm_token}) => {
+  return new Promise((resolve, reject) => {
+    let query = `update "Account" set access_tokens=array_remove(access_tokens, $2), fcm_tokens=array_remove(fcm_tokens, $3) where account_id=$1 returning account_id`
+    let params = [account_id, access_token, fcm_token]
 
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)

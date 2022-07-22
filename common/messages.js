@@ -28,6 +28,7 @@ module.exports = {
     username_required: 'Yêu cầu cung cấp tên đăng nhập',
 
     login_success: 'Đăng nhập thành công',
+    logout_success: 'Đăng xuất thành công',
     add_success: 'Thêm thành công',
     update_success: 'Cập nhật thành công',
     password_updated: 'Mật khẩ đã được cập nhật',

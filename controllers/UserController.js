@@ -26,7 +26,7 @@ userController.createAccount = async (req, res, next) => {
 }
 
 userController.login = async (req, res, next) => {
-  let {username, password} = req.body
+  let {username, password, fcm_token} = req.body
   try {
     if (!username) throw new BadRequest(messages.user.username_required)
     if (!password) throw new BadRequest(messages.user.password_required)
@@ -40,12 +40,31 @@ userController.login = async (req, res, next) => {
     if (role_id !== role.customer) throw new Forbidden()
     let {user_id} = await userModule.findUserByAccount({account_id})
     let access_token = utils.generateAccessToken({user_id, account_id})
-    if (await userModule.addAccessToken({account_id, access_token})) {
+    if (
+      await userModule.addAccountToken({account_id, access_token, fcm_token})
+    ) {
       res.success({
         message: messages.user.login_success,
         data: [{access_token}]
       })
     }
+  } catch (e) {
+    next(e)
+  }
+}
+
+userController.logout = async (req, res, next) => {
+  let {account_id, access_token} = req.user
+  let {fcm_token} = req.body
+  try {
+    res.success({
+      message: messages.user.logout_success,
+      data: await userModule.removeAccountToken({
+        account_id,
+        access_token,
+        fcm_token
+      })
+    })
   } catch (e) {
     next(e)
   }
