@@ -2,102 +2,65 @@ const jwt = require('jsonwebtoken')
 
 const UserModule = require('../modules/UserModule')
 const {messages, utils} = require('../common')
+const {Unauthorized, InvalidToken, Forbidden} = require('../utils/Errors')
+const {role} = require('../common/constants')
 
 const auth = {}
 
 auth.verifyUser = (req, res, next) => {
-  const authHeader = req.headers['authorization']
-  const token = authHeader && authHeader.split(' ')[1]
-  if (token == null)
-    return utils.onResponse(
-      res,
-      'fail',
-      401,
-      messages.auth.unauthorized,
-      null,
-      null
-    )
+  try {
+    const authHeader = req.headers['authorization']
+    const access_token = authHeader && authHeader.split(' ')[1]
+    if (!access_token) throw new Unauthorized()
 
-  jwt.verify(token, process.env.ACCESSTOKEN, async (err, ress) => {
-    if (err)
-      return utils.onResponse(
-        res,
-        'fail',
-        401,
-        messages.auth.token_invalid,
-        null,
-        null
-      )
-    var user = ress.user
-    if (!(user.username && (await UserModule.get(user.username))))
-      return utils.onResponse(
-        res,
-        'fail',
-        404,
-        messages.user.not_found,
-        null,
-        null
-      )
-    if (user.role && user.role < 0)
-      return utils.onResponse(
-        res,
-        'fail',
-        403,
-        messages.auth.forbidden,
-        null,
-        null
-      )
+    jwt.verify(access_token, process.env.ACCESSTOKEN, async (err, data) => {
+      try {
+        if (err) throw new InvalidToken()
 
-    req.user = user
-    next()
-  })
+        var {user_id, account_id} = data.user
+
+        if (!(await UserModule.isValidAccessToken({account_id, access_token})))
+          throw new InvalidToken()
+        if ((await UserModule.getUserInfo({user_id})).role_id !== role.customer)
+          throw new Forbidden()
+
+        req.user = {user_id, account_id}
+        next()
+      } catch (e) {
+        next(e)
+      }
+    })
+  } catch (e) {
+    next(e)
+  }
 }
 
 auth.verifyAdmin = (req, res, next) => {
-  const authHeader = req.headers['authorization']
-  const token = authHeader && authHeader.split(' ')[1]
-  if (token == null)
-    return utils.onResponse(
-      res,
-      'fail',
-      401,
-      messages.auth.unauthorized,
-      null,
-      null
-    )
+  try {
+    const authHeader = req.headers['authorization']
+    const access_token = authHeader && authHeader.split(' ')[1]
+    if (!access_token) throw new Unauthorized()
 
-  jwt.verify(token, process.env.ACCESSTOKEN, async (err, ress) => {
-    if (err)
-      return utils.onResponse(
-        res,
-        'fail',
-        401,
-        messages.auth.token_invalid,
-        null,
-        null
-      )
-    var user = ress.user
-    if (!(user.username && (await UserModule.get(user.username))))
-      return utils.onResponse(
-        res,
-        'fail',
-        404,
-        messages.user.not_found,
-        null,
-        null
-      )
-    if (user.role && user.role < 1)
-      return utils.onResponse(
-        res,
-        'fail',
-        403,
-        messages.auth.forbidden,
-        null,
-        null
-      )
-    req.user = user
-    next()
-  })
+    jwt.verify(access_token, process.env.ACCESSTOKEN, async (err, data) => {
+      try {
+        if (err) throw new InvalidToken()
+
+        var {user_id, account_id} = data.user
+
+        if (!(await UserModule.isValidAccessToken({account_id, access_token})))
+          throw new InvalidToken()
+        if ((await UserModule.getUserInfo({user_id})).role_id !== role.admin)
+          throw new Forbidden()
+
+        req.user = {user_id, account_id}
+        next()
+      } catch (e) {
+        next(e)
+      }
+    })
+  } catch (e) {
+    next(e)
+  }
 }
 
 module.exports = auth

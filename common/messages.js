@@ -25,6 +25,7 @@ module.exports = {
       'Mật khẩu phải ít nhất 8 ký tự, một chữ cái, một số và một ký tự đặc biệt',
     create_account_failed: 'Xảy ra lỗi không thể tạo tài khoản',
     create_account_success: 'Tạo tài khoản thành công',
+    username_required: 'Yêu cầu cung cấp tên đăng nhập',
 
     login_success: 'Đăng nhập thành công',
     add_success: 'Thêm thành công',

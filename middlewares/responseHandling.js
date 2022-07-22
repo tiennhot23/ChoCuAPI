@@ -13,7 +13,7 @@ function responseHandling(req, res, next) {
       code,
       message,
       page,
-      data: helper.isArray(data) ? data : [data]
+      data: helper.isArray(data) ? data : data ? [data] : []
     })
   }
 

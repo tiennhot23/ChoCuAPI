@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken')
+const helper = require('./helper')
 
 module.exports = {
   generateAccessToken: (user) => {
@@ -48,5 +49,8 @@ module.exports = {
   addMinutes(numOfMinute, date = new Date()) {
     date.setTime(date.getTime() + numOfMinute * 60 * 1000)
     return date
+  },
+  removeCharAt(str, position) {
+    return str.slice(0, position) + str.slice(position + 1)
   }
 }

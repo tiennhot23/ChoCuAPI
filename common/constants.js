@@ -5,7 +5,7 @@ const baseURL = 'https://localhost:3000/'
 const max_int = 2e9
 const role = {
   deliver: 'deliver',
-  general: 'general',
+  customer: 'customer',
   admin: 'admin'
 }
 

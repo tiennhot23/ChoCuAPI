@@ -1,5 +1,6 @@
 const express = require('express')
 const {otpController, userController} = require('../controllers')
+const auth = require('../middlewares/auth')
 const encrypt = require('../middlewares/encrypt')
 
 const user = express.Router()
@@ -10,5 +11,9 @@ user.post(
   encrypt.hashPassword,
   userController.createAccount
 )
+
+user.post('/login', userController.login)
+
+user.put('/update-info', auth.verifyUser, userController.updateInfo)
 
 module.exports = user

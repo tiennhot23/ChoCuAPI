@@ -50,7 +50,7 @@ module.exports = {
     if (obj === undefined || obj === null) {
       return false
     }
-    if (isArray(obj)) {
+    if (obj !== undefined && obj !== null && obj.constructor === Array) {
       return false
     }
     if (isBoolean(obj)) {
@@ -82,9 +82,17 @@ module.exports = {
 
   isEmptyObject: (obj) => isEmpty(obj),
   isEmptyString: (str) => isString(str) && str.length === 0,
-  isEmptyArray: (arr) => isArray(arr) && arr.length === 0,
+  isEmptyArray: (arr) =>
+    arr !== undefined &&
+    arr !== null &&
+    arr.constructor === Array &&
+    arr.length === 0,
   isNonEmptyString: (str) => isString(str) && str.length > 0,
-  isNonEmptyArray: (arr) => isArray(arr) && arr.length > 0,
+  isNonEmptyArray: (arr) =>
+    arr !== undefined &&
+    arr !== null &&
+    arr.constructor === Array &&
+    arr.length > 0,
 
   isValidObject: (object) => {
     return object !== undefined && object !== null
