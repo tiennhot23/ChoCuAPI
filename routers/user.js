@@ -16,6 +16,20 @@ user.post('/login', userController.login)
 
 user.post('/logout', auth.verifyUser, userController.logout)
 
+user.post(
+  '/forgot-password',
+  otpController.verifyAction,
+  encrypt.hashPassword,
+  userController.resetPassword
+)
+
 user.put('/update-info', auth.verifyUser, userController.updateInfo)
+
+user.put(
+  '/reset-password',
+  auth.verifyUser,
+  encrypt.hashPassword,
+  userController.resetPassword
+)
 
 module.exports = user

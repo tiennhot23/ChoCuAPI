@@ -26,12 +26,12 @@ module.exports = {
     create_account_failed: 'Xảy ra lỗi không thể tạo tài khoản',
     create_account_success: 'Tạo tài khoản thành công',
     username_required: 'Yêu cầu cung cấp tên đăng nhập',
+    password_reseted: 'Mật khẩu đã được cập nhật',
 
     login_success: 'Đăng nhập thành công',
     logout_success: 'Đăng xuất thành công',
     add_success: 'Thêm thành công',
     update_success: 'Cập nhật thành công',
-    password_updated: 'Mật khẩ đã được cập nhật',
     delete_success: 'Tài khoản này cùng toàn bộ dữ liệu liên qan đã bị xóa.',
     registed_success: 'Đăng kí thành công',
     registed_fail: 'Đăng kí thất bại',

@@ -1,7 +1,12 @@
 const {helper, utils, messages} = require('../common')
 const {role} = require('../common/constants')
 const {otpModule, userModule} = require('../modules')
-const {BadRequest, GeneralError, Forbidden} = require('../utils/Errors')
+const {
+  BadRequest,
+  GeneralError,
+  Forbidden,
+  NotFound
+} = require('../utils/Errors')
 
 const userController = {}
 
@@ -65,6 +70,28 @@ userController.logout = async (req, res, next) => {
         fcm_token
       })
     })
+  } catch (e) {
+    next(e)
+  }
+}
+
+userController.resetPassword = async (req, res, next) => {
+  let {password, phone, verify_code} = req.body
+  let {account_id} = req.user || {}
+  try {
+    if (!account_id)
+      account_id = (await userModule.findAccountByUsername({username: phone}))
+        .account_id
+
+    if (!account_id) throw new NotFound(messages.user.not_found)
+
+    if (await userModule.updatePassword({account_id, password})) {
+      if (verify_code) await otpModule.deleteOTP(phone)
+      res.success({
+        message: messages.user.password_updated,
+        data: [{updated: true}]
+      })
+    } else throw new GeneralError(messages.common.something_wrong)
   } catch (e) {
     next(e)
   }

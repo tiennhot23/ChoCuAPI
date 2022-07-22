@@ -14,7 +14,7 @@ const userModule = {}
 userModule.getUserInfo = ({user_id}) => {
   return new Promise((resolve, reject) => {
     let query = `select u.user_id, name, phone, email, address, rating, a.role_id
-    from "Customer" u, "Account" a where user_id=$1 and a.active=true`
+    from "Customer" u, "Account" a where user_id=$1`
 
     let params = [user_id]
 
@@ -28,7 +28,7 @@ userModule.getUserInfo = ({user_id}) => {
 userModule.findUserByAccount = ({account_id}) => {
   return new Promise((resolve, reject) => {
     let query = `select u.user_id, name, phone, email, address, rating, a.role_id
-    from "Customer" u, "Account" a where a.account_id=$1 and a.active=true`
+    from "Customer" u, "Account" a where a.account_id=$1`
 
     let params = [account_id]
 
@@ -42,9 +42,22 @@ userModule.findUserByAccount = ({account_id}) => {
 userModule.findAdminByAccount = ({account_id}) => {
   return new Promise((resolve, reject) => {
     let query = `select u.admin_id as user_id, name, email, a.role_id
-    from "Admin" u, "Account" a where a.account_id=$1 and a.active=true`
+    from "Admin" u, "Account" a where a.account_id=$1`
 
     let params = [account_id]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows[0])
+    })
+  })
+}
+
+userModule.findAccountByUsername = ({username}) => {
+  return new Promise((resolve, reject) => {
+    let query = `select * from "Account" where username=$1 and active=true`
+
+    let params = [username]
 
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)
@@ -180,6 +193,18 @@ userModule.updateInfo = ({user_id, name, avatar, email, address}) => {
       } else {
         return resolve(res.rows[0])
       }
+    })
+  })
+}
+
+userModule.updatePassword = ({account_id, password}) => {
+  return new Promise((resolve, reject) => {
+    let query = `update "Account" set password=$2 where account_id=$1 and active=true`
+    let params = [account_id, password]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(true)
     })
   })
 }
