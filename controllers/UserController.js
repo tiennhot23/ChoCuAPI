@@ -110,4 +110,36 @@ userController.updateInfo = async (req, res, next) => {
   }
 }
 
+userController.addUserPayment = async (req, res, next) => {
+  let {user_id} = req.user
+  let {payment_id, user_payment_info} = req.body
+  try {
+    if (
+      await userModule.addUserPayment({user_id, payment_id, user_payment_info})
+    )
+      res.success({
+        message: messages.user.add_success,
+        data: [{added: true}]
+      })
+    else throw new GeneralError(messages.common.something_wrong)
+  } catch (e) {
+    next(e)
+  }
+}
+
+userController.removeUserPayment = async (req, res, next) => {
+  let {user_id} = req.user
+  let {payment_id} = req.body
+  try {
+    if (await userModule.removeUserPayment({user_id, payment_id}))
+      res.success({
+        message: messages.user.delete_success,
+        data: [{deleted: true}]
+      })
+    else throw new GeneralError(messages.common.something_wrong)
+  } catch (e) {
+    next(e)
+  }
+}
+
 module.exports = userController

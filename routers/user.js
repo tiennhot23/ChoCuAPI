@@ -23,6 +23,8 @@ user.post(
   userController.resetPassword
 )
 
+user.post('/add-user-payment', auth.verifyUser, userController.addUserPayment)
+
 user.put('/update-info', auth.verifyUser, userController.updateInfo)
 
 user.put(
@@ -30,6 +32,12 @@ user.put(
   auth.verifyUser,
   encrypt.hashPassword,
   userController.resetPassword
+)
+
+user.delete(
+  '/remove-user-payment',
+  auth.verifyUser,
+  userController.removeUserPayment
 )
 
 module.exports = user

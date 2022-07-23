@@ -209,4 +209,28 @@ userModule.updatePassword = ({account_id, password}) => {
   })
 }
 
+userModule.addUserPayment = ({user_id, payment_id, user_payment_info}) => {
+  return new Promise((resolve, reject) => {
+    let query = `insert into "UserPayment" values ($1, $2, $3)`
+    let params = [user_id, payment_id, user_payment_info]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(true)
+    })
+  })
+}
+
+userModule.removeUserPayment = ({user_id, payment_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `delete from "UserPayment" where user_id=$1 and payment_id=$2`
+    let params = [user_id, payment_id]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(true)
+    })
+  })
+}
+
 module.exports = userModule
