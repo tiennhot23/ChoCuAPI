@@ -10,6 +10,39 @@ const {
 
 const userController = {}
 
+userController.getUserInfo = async (req, res, next) => {
+  let {user_id} = req.params
+  try {
+    res.success({
+      data: await userModule.getUserInfo({user_id})
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
+userController.getUserFollowStatistic = async (req, res, next) => {
+  let {user_id} = req.params
+  try {
+    res.success({
+      data: await userModule.getUserFollows({user_id})
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
+userController.getUserPosts = async (req, res, netx) => {
+  let {user_id, post_state} = req.params
+  try {
+    res.success({
+      data: await userModule.getUserPosts({user_id, post_state})
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
 userController.createAccount = async (req, res, next) => {
   let {phone, password} = req.body
   try {

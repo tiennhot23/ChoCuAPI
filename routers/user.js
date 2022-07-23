@@ -5,6 +5,12 @@ const encrypt = require('../middlewares/encrypt')
 
 const user = express.Router()
 
+user.get('/:user_id', userController.getUserInfo)
+
+user.get('/user-follow/:user_id', userController.getUserFollowStatistic)
+
+user.get('/user-posts/:post_state/:user_id', userController.getUserPosts)
+
 user.post(
   '/create-account',
   otpController.verifyAction,

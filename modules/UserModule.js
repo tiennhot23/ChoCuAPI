@@ -13,7 +13,7 @@ const userModule = {}
  */
 userModule.getUserInfo = ({user_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select u.user_id, name, phone, email, address, rating, a.role_id
+    let query = `select u.user_id, name, phone, email, address, rating, a.role_id, a.active
     from "Customer" u, "Account" a where user_id=$1`
 
     let params = [user_id]
@@ -25,9 +25,48 @@ userModule.getUserInfo = ({user_id}) => {
   })
 }
 
+userModule.getUserFollows = ({user_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `select user_follower_id=$1 as is_following, count(*) from "Follower" 
+    where user_follower_id=$1 or user_following_id=$1 group by user_follower_id=$1`
+
+    let params = [user_id]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else {
+        let user_follower = 0
+        let user_following = 0
+        res.rows.map((item) => {
+          if (item.is_following) {
+            user_following = item.count
+          } else {
+            user_follower = item.count
+          }
+        })
+        return resolve({user_follower, user_following})
+      }
+    })
+  })
+}
+
+userModule.getUserPosts = ({user_id, post_state}) => {
+  return new Promise((resolve, reject) => {
+    let query = `select post_id, title, default_price, sell_address, picture, time_created, time_updated 
+    from "Post" where seller_id=$1 and post_state=$2 order by time_updated`
+
+    let params = [user_id, post_state]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows)
+    })
+  })
+}
+
 userModule.findUserByAccount = ({account_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select u.user_id, name, phone, email, address, rating, a.role_id
+    let query = `select u.user_id, name, phone, email, address, rating, a.role_id, a.active
     from "Customer" u, "Account" a where a.account_id=$1`
 
     let params = [account_id]
@@ -41,7 +80,7 @@ userModule.findUserByAccount = ({account_id}) => {
 
 userModule.findAdminByAccount = ({account_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select u.admin_id as user_id, name, email, a.role_id
+    let query = `select u.admin_id as user_id, name, email, a.role_id, a.active
     from "Admin" u, "Account" a where a.account_id=$1`
 
     let params = [account_id]
