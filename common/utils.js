@@ -52,5 +52,16 @@ module.exports = {
   },
   removeCharAt(str, position) {
     return str.slice(0, position) + str.slice(position + 1)
+  },
+  toTSQueryPostgreSyntax(message) {
+    let res = ''
+    message
+      .trim()
+      .replace(/\s{1,}/g, '-')
+      .split('-')
+      .map((e) => {
+        res += `${e} & `
+      })
+    return ` ${res.slice(0, res.length - 3)} `
   }
 }
