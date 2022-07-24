@@ -13,6 +13,18 @@ module.exports = {
     otp_verified: 'Xác thực OTP thành công',
     otp_created: 'Tạo mã OTP thành công'
   },
+  category: {
+    id_required: 'Yêu cầu cung cấp mã danh mục',
+    title_required: 'Yêu cầu cung cấp tiểu đề danh mục',
+    icon_required: 'Yêu cầu cung cáp icon danh mục',
+    not_found: 'Không tìm thấy danh mục'
+  },
+  details: {
+    id_required: 'Yêu cầu cung cấp mã chi tiết',
+    title_required: 'Yêu cầu cung cấp nhãn chi tiết',
+    icon_required: 'Yêu cầu cung cáp icon chi tiết',
+    not_found: 'Không tìm thấy chi tiết'
+  },
   file: {
     not_exist: 'File không tồn tại',
     choose_file: 'Vui lòng chọn file'
@@ -85,6 +97,9 @@ module.exports = {
     account_role_fk: 'Không tìm thấy quyền tài khoản này'
   },
   common: {
-    something_wrong: 'Lỗi không xác định'
+    something_wrong: 'Lỗi không xác định',
+    add_success: 'Thêm thành công',
+    update_success: 'Cập nhật thành công',
+    delete_success: 'Xoá thành công'
   }
 }

@@ -81,13 +81,21 @@ module.exports = {
   },
 
   isEmptyObject: (obj) => isEmpty(obj),
-  isEmptyString: (str) => isString(str) && str.length === 0,
+  isEmptyString: (str) =>
+    str !== undefined &&
+    str !== null &&
+    str.constructor === String &&
+    str.length === 0,
   isEmptyArray: (arr) =>
     arr !== undefined &&
     arr !== null &&
     arr.constructor === Array &&
     arr.length === 0,
-  isNonEmptyString: (str) => isString(str) && str.length > 0,
+  isNonEmptyString: (str) =>
+    str !== undefined &&
+    str !== null &&
+    str.constructor === String &&
+    str.length > 0,
   isNonEmptyArray: (arr) =>
     arr !== undefined &&
     arr !== null &&

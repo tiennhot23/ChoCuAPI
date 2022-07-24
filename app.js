@@ -10,6 +10,8 @@ const user = require('./routers/user')
 const errorHandling = require('./middlewares/errorHandling')
 const responseHandling = require('./middlewares/responseHandling')
 const post = require('./routers/post')
+const category = require('./routers/category')
+const details = require('./routers/details')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -33,6 +35,8 @@ app.use('/location', location)
 app.use('/otp', otp)
 app.use('/user', user)
 app.use('/post', post)
+app.use('/category', category)
+app.use('/details', details)
 app.use('/upload', upload)
 app.use('/', (req, res, next) => {
   res.json({message: 'HELLO STRANGER'})
