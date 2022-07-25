@@ -22,6 +22,17 @@ controller.getCategories = async (req, res, next) => {
   }
 }
 
+controller.getCategoryDetails = async (req, res, next) => {
+  let {category_id} = req.params
+  try {
+    res.success({
+      data: await cateModule.get_details({category_id})
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
 controller.addCategory = async (req, res, next) => {
   let {category_title, category_icon} = req.body
   try {
@@ -55,6 +66,23 @@ controller.updateCategory = async (req, res, next) => {
       message: messages.common.update_success,
       data: category
     })
+  } catch (e) {
+    next(e)
+  }
+}
+
+controller.addDetails = async (req, res, next) => {
+  let {category_id} = req.params
+  let {details_id, required} = req.body
+  try {
+    if (!helper.isValidObject(details_id))
+      throw new BadRequest(messages.category.details_id_required)
+
+    if (await cateModule.add_details({category_id, details_id, required}))
+      res.success({
+        message: messages.common.add_success,
+        data: [{added: true}]
+      })
   } catch (e) {
     next(e)
   }

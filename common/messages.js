@@ -17,7 +17,8 @@ module.exports = {
     id_required: 'Yêu cầu cung cấp mã danh mục',
     title_required: 'Yêu cầu cung cấp tiểu đề danh mục',
     icon_required: 'Yêu cầu cung cáp icon danh mục',
-    not_found: 'Không tìm thấy danh mục'
+    not_found: 'Không tìm thấy danh mục',
+    details_id_required: 'Yêu cầu cung cấp mã chi tiết'
   },
   details: {
     id_required: 'Yêu cầu cung cấp mã chi tiết',
