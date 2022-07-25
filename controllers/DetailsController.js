@@ -1,7 +1,6 @@
-const {detailsController} = require('.')
 const {helper, utils, messages} = require('../common')
 const {role} = require('../common/constants')
-const {detailsModule} = require('../modules')
+const {detailsModule, fileModule} = require('../modules')
 const {
   BadRequest,
   GeneralError,
@@ -23,21 +22,49 @@ controller.getDetails = async (req, res, next) => {
 
 controller.addDetails = async (req, res, next) => {
   let {details_title, details_icon, default_content, editable} = req.body
+  let isUploadFile =
+    req.files &&
+    req.files.length > 0 &&
+    req.files[0].fieldname === 'details_icon'
   try {
     if (!helper.isValidObject(details_title))
       throw new BadRequest(messages.details.title_required)
-    if (!helper.isValidObject(details_icon))
+    if (!helper.isValidObject(details_icon) && !isUploadFile)
       throw new BadRequest(messages.details.icon_required)
 
-    res.success({
-      message: messages.common.add_success,
-      data: await detailsModule.add({
-        details_title,
-        details_icon,
-        default_content,
-        editable
-      })
+    if (isUploadFile) {
+      if (!req.files[0]['mimetype'].includes('image'))
+        throw new BadRequest(messages.common.image_invalid)
+    }
+
+    let details = await detailsModule.add({
+      details_title,
+      details_icon,
+      default_content,
+      editable
     })
+
+    if (helper.isValidObject(details)) {
+      if (isUploadFile) {
+        details_icon = await fileModule.upload_single(
+          req.files[0],
+          'details/',
+          details.details_id
+        )
+        details = await detailsModule.update({
+          details_id: details.details_id,
+          details_title: null,
+          details_icon,
+          default_content: null,
+          editable: null
+        })
+      }
+
+      res.success({
+        message: messages.common.add_success,
+        data: details
+      })
+    } else throw new GeneralError(messages.common.something_wrong)
   } catch (e) {
     next(e)
   }
@@ -46,7 +73,21 @@ controller.addDetails = async (req, res, next) => {
 controller.updateDetails = async (req, res, next) => {
   let {details_title, details_icon, default_content, editable} = req.body
   let {details_id} = req.params
+  let isUploadFile =
+    req.files &&
+    req.files.length > 0 &&
+    req.files[0].fieldname === 'details_icon'
   try {
+    if (isUploadFile) {
+      if (!req.files[0]['mimetype'].includes('image'))
+        throw new BadRequest(messages.common.image_invalid)
+      details_icon = await fileModule.upload_single(
+        req.files[0],
+        'details/',
+        details_id
+      )
+    }
+
     let details = await detailsModule.update({
       details_id,
       details_title,
@@ -54,6 +95,7 @@ controller.updateDetails = async (req, res, next) => {
       default_content,
       editable
     })
+
     if (!helper.isValidObject(details))
       throw new NotFound(messages.details.not_found)
 

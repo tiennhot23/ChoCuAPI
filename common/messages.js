@@ -101,6 +101,7 @@ module.exports = {
     something_wrong: 'Lỗi không xác định',
     add_success: 'Thêm thành công',
     update_success: 'Cập nhật thành công',
-    delete_success: 'Xoá thành công'
+    delete_success: 'Xoá thành công',
+    image_invalid: 'File ảnh không hợp lệ'
   }
 }

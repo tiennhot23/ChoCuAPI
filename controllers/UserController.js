@@ -1,6 +1,6 @@
 const {helper, utils, messages} = require('../common')
 const {role} = require('../common/constants')
-const {otpModule, userModule} = require('../modules')
+const {otpModule, userModule, fileModule} = require('../modules')
 const {
   BadRequest,
   GeneralError,
@@ -133,7 +133,19 @@ userController.resetPassword = async (req, res, next) => {
 userController.updateInfo = async (req, res, next) => {
   let {name, avatar, email, address} = req.body
   let {user_id} = req.user
+  let isUploadFile =
+    req.files && req.files.length > 0 && req.files[0].fieldname === 'avatar'
   try {
+    if (isUploadFile) {
+      if (!req.files[0]['mimetype'].includes('image'))
+        throw new BadRequest(messages.common.image_invalid)
+      avatar = await fileModule.upload_single(
+        req.files[0],
+        `user/${user_id}`,
+        'avatar'
+      )
+    }
+
     res.success({
       message: messages.user.update_success,
       data: await userModule.updateInfo({user_id, name, avatar, email, address})

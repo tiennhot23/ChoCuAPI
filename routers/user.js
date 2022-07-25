@@ -1,9 +1,15 @@
 const express = require('express')
+const {memoryStorage} = require('multer')
+const multer = require('multer')
 const {otpController, userController} = require('../controllers')
 const auth = require('../middlewares/auth')
 const encrypt = require('../middlewares/encrypt')
 
 const user = express.Router()
+
+const upload = multer({
+  storage: memoryStorage()
+})
 
 user.get('/:user_id', userController.getUserInfo)
 
@@ -31,7 +37,12 @@ user.post(
 
 user.post('/add-user-payment', auth.verifyUser, userController.addUserPayment)
 
-user.put('/update-info', auth.verifyUser, userController.updateInfo)
+user.put(
+  '/update-info',
+  auth.verifyUser,
+  upload.any('avatar'),
+  userController.updateInfo
+)
 
 user.put(
   '/reset-password',

@@ -46,7 +46,7 @@ detailsModule.add = ({
 
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)
-      else return resolve(res.rows)
+      else return resolve(res.rows[0])
     })
   })
 }
