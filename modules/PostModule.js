@@ -42,6 +42,49 @@ postModule.get = ({key_search, location, category}) => {
   })
 }
 
+postModule.getPost = ({post_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `select post_id, seller_id, title, default_price, sell_address, post_state, 
+      description, picture, time_created, time_updated, priority_level, online_payment 
+      from "Post" where post_id=$1`
+    let params = [post_id]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows[0])
+    })
+  })
+}
+
+postModule.getPostCate = ({post_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `select * from "Category" 
+      where category_id=(select category_id 
+                          from "PostCateDetails" where post_id=$1 limit 1) 
+      limit 1`
+    let params = [post_id]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows[0])
+    })
+  })
+}
+
+postModule.getPostCateDetails = ({post_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `select pcd.details_id, details_title, details_icon, content 
+      from "PostCateDetails" pcd, "Details" d 
+      where d.details_id=pcd.details_id and pcd.post_id=$1`
+    let params = [post_id]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows)
+    })
+  })
+}
+
 postModule.add = ({
   seller_id,
   title,

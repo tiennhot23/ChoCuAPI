@@ -85,7 +85,8 @@ module.exports = {
     picture_required: 'Yêu cầu tối đa 1 ảnh',
     category_required: 'Yêu cầu mã danh mục',
     details_required: 'Yêu cầu danh sách thông tin chi tiết',
-    missing_required_details: 'Thiếu các chi tiết bắt buộc'
+    missing_required_details: 'Thiếu các chi tiết bắt buộc',
+    not_found: 'Không tìm thấy bài đăng này.'
   },
   history: {
     add_success: 'Thêm thành công',

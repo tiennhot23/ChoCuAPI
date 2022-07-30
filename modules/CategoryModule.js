@@ -16,10 +16,10 @@ cateModule.get_all = () => {
   })
 }
 
-cateModule.get = ({category_title}) => {
+cateModule.get = ({category_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select * from "Category" c, "Details" d where category_title=$1 limit 1`
-    let params = [category_title]
+    let query = `select * from "Category" where category_id=$1 limit 1`
+    let params = [category_id]
 
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)

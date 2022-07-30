@@ -27,6 +27,27 @@ controller.getPosts = async (req, res, next) => {
   }
 }
 
+controller.getPost = async (req, res, next) => {
+  let {post_id} = req.params
+  try {
+    let post = await postModule.getPost({post_id})
+    if (!post) throw new NotFound(messages.post.not_found)
+    let user = await userModule.getUserInfo({user_id: post.seller_id})
+    let category = await postModule.getPostCate({post_id})
+    let details = await postModule.getPostCateDetails({post_id})
+    res.success({
+      data: {
+        post,
+        user,
+        category,
+        details
+      }
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
 controller.createPost = async (req, res, next) => {
   let {
     title,
@@ -90,7 +111,7 @@ controller.createPost = async (req, res, next) => {
       if (isUploadFile) {
         picture = await fileModule.upload_multi_with_index(
           req.files,
-          `post/${post.post_id}`
+          `post/${post.post_id}/`
         )
         post = await postModule.update({
           post_id: post.post_id,

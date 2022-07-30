@@ -141,7 +141,7 @@ userController.updateInfo = async (req, res, next) => {
         throw new BadRequest(messages.common.image_invalid)
       avatar = await fileModule.upload_single(
         req.files[0],
-        `user/${user_id}`,
+        `user/${user_id}/`,
         'avatar'
       )
     }
