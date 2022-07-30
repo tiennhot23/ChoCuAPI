@@ -64,6 +64,18 @@ userModule.getUserPosts = ({user_id, post_state}) => {
   })
 }
 
+userModule.getUserPostTurn = ({user_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `select post_turn from "Customer" where user_id=$1 limit 1`
+    let params = [user_id]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows[0])
+    })
+  })
+}
+
 userModule.findUserByAccount = ({account_id}) => {
   return new Promise((resolve, reject) => {
     let query = `select u.user_id, name, phone, email, address, rating, a.role_id, a.active
@@ -262,12 +274,36 @@ userModule.addUserPayment = ({user_id, payment_id, user_payment_info}) => {
 
 userModule.removeUserPayment = ({user_id, payment_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `delete from "UserPayment" where user_id=$1 and payment_id=$2`
+    let query = `delete from "UserPayment" where user_id=$1 and payment_id=$2 returning *`
     let params = [user_id, payment_id]
 
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)
       else return resolve(true)
+    })
+  })
+}
+
+userModule.decreasePostTurn = ({user_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `update "Customer" set post_turn=post_turn-1 where user_id=$1 returning post_turn`
+    let params = [user_id]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows[0])
+    })
+  })
+}
+
+userModule.increasePostTurn = ({user_id, extra_post_turn}) => {
+  return new Promise((resolve, reject) => {
+    let query = `update "Customer" set post_turn=post_turn+$2 where user_id=$1 returning post_turn`
+    let params = [user_id, extra_post_turn]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows[0])
     })
   })
 }

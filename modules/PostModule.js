@@ -42,4 +42,96 @@ postModule.get = ({key_search, location, category}) => {
   })
 }
 
+postModule.add = ({
+  seller_id,
+  title,
+  default_price,
+  sell_address,
+  description,
+  picture,
+  online_payment
+}) => {
+  return new Promise((resolve, reject) => {
+    let post_id = uuidv4()
+    let query = `insert into "Post" (post_id, seller_id, title, default_price, sell_address, picture 
+    ${description ? `, description` : ``} ${
+      online_payment ? `, online_payment` : ``
+    }) values ($1, $2, $3, $4, $5, $6 
+    ${description ? `, $7` : ``} ${online_payment ? `, $8` : ``}) returning *`
+
+    let params = [
+      post_id,
+      seller_id,
+      title,
+      default_price,
+      sell_address,
+      picture
+    ]
+    if (description) params.push(description)
+    if (online_payment) params.push(online_payment)
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows[0])
+    })
+  })
+}
+
+postModule.addPostCateDetails = ({post_id, category_id, details}) => {
+  return new Promise((resolve, reject) => {
+    if (details.length === 0) return resolve(null)
+    let query = `insert into "PostCateDetails" (post_id, category_id, details_id, content) values `
+    let num = 3
+    let params = [post_id, category_id]
+    details.map((e) => {
+      query += `($1, $2, $${num++}, $${num++}),`
+      params.push(e.details_id, e.content)
+    })
+
+    if (query.endsWith('values ')) return resolve(null)
+    query = utils.removeCharAt(query, query.length - 1)
+    query += ` returning *`
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else resolve(res.rows)
+    })
+  })
+}
+
+postModule.update = ({post_id, picture, post_state, priority_level}) => {
+  return new Promise((resolve, reject) => {
+    let num = 1
+    let query = `update "Post" set `
+    let params = []
+
+    if (picture) {
+      query += ` picture=$${num++},`
+      params.push(picture)
+    }
+    if (post_state) {
+      query += ` post_state=$${num++},`
+      params.push(post_state)
+    }
+    if (priority_level) {
+      query += ` post_state=$${num++},`
+      params.push(priority_level)
+    }
+
+    if (query.endsWith(' ')) {
+      query = `select * from "Post" where post_id=$${num}`
+      params.push(post_id)
+    } else {
+      query = utils.removeCharAt(query, query.length - 1)
+      query += ` where post_id=$${num} returning *`
+      params.push(post_id)
+    }
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows[0])
+    })
+  })
+}
+
 module.exports = postModule

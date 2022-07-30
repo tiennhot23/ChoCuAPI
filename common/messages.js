@@ -41,6 +41,8 @@ module.exports = {
     username_required: 'Yêu cầu cung cấp tên đăng nhập',
     password_reseted: 'Mật khẩu đã được cập nhật',
 
+    post_turn_out: 'Hết lượt đăng bài',
+
     login_success: 'Đăng nhập thành công',
     logout_success: 'Đăng xuất thành công',
     add_success: 'Thêm thành công',
@@ -75,6 +77,15 @@ module.exports = {
     book_follows_pk: 'Sách đã được follow bởi user này',
     book_fk: 'Sách không tồn tại',
     username_fk: 'User này không khả dụng'
+  },
+  post: {
+    title_required: 'Yêu cầu tiểu đề bài đăng',
+    price_required: 'Yêu cầu giá sản phẩm',
+    address_required: 'Yêu cầu địa chỉ bán',
+    picture_required: 'Yêu cầu tối đa 1 ảnh',
+    category_required: 'Yêu cầu mã danh mục',
+    details_required: 'Yêu cầu danh sách thông tin chi tiết',
+    missing_required_details: 'Thiếu các chi tiết bắt buộc'
   },
   history: {
     add_success: 'Thêm thành công',

@@ -99,4 +99,28 @@ cateModule.add_details = ({category_id, details_id, required}) => {
   })
 }
 
+cateModule.check_required_details = ({category_id, details}) => {
+  return new Promise((resolve, reject) => {
+    let query = `select details_id from "CateDetails" where category_id=$1 and required=true`
+    let params = [category_id]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else {
+        let list_details_id = res.rows.map((e) => e.details_id)
+        list_details_id.map((e) => {
+          if (
+            !(
+              details_id.includes(e.list_details_id) &&
+              helper.isValidObject(e.content)
+            )
+          )
+            return resolve(false)
+        })
+        return resolve(true)
+      }
+    })
+  })
+}
+
 module.exports = cateModule
