@@ -13,7 +13,7 @@ details.get('/', detailsController.getDetails)
 
 details.post('/', upload.any('details_icon'), detailsController.addDetails)
 
-details.put(
+details.post(
   '/:details_id',
   upload.any('details_icon'),
   detailsController.updateDetails

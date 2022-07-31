@@ -82,6 +82,20 @@ adminController.denyPost = async (req, res, next) => {
   }
 }
 
+adminController.deletePost = async (req, res, next) => {
+  let {post_id} = req.params
+  try {
+    let post = await postModule.getPost({post_id})
+    if (!post) throw new NotFound(messages.post.not_found)
+    res.success({
+      message: messages.post.post_deleted,
+      data: await postModule.update({post_id, post_state: postState.DELETED})
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
 adminController.lockAccount = async (req, res, next) => {
   let {username} = req.params
   try {

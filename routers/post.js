@@ -20,4 +20,6 @@ post.post(
   postController.createPost
 )
 
+post.post('/end-post/:post_id', auth.verifyUser, postController.endPost)
+
 module.exports = post

@@ -37,14 +37,14 @@ user.post(
 
 user.post('/add-user-payment', auth.verifyUser, userController.addUserPayment)
 
-user.put(
+user.post(
   '/update-info',
   auth.verifyUser,
   upload.any('avatar'),
   userController.updateInfo
 )
 
-user.put(
+user.post(
   '/reset-password',
   auth.verifyUser,
   encrypt.hashPassword,

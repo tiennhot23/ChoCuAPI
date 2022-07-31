@@ -92,7 +92,9 @@ module.exports = {
     post_denied: 'Bài đăng đã bị từ chối',
     post_deleted: 'Bài đăng đã xoá',
     post_expired: 'Bài đăng đã hết',
-    post_not_pending: 'Bài đăng không ở trạng thái chờ phê duyệt'
+    post_pending: 'Bài đăng đang chờ duyệt',
+    post_not_pending: 'Bài đăng không ở trạng thái chờ phê duyệt',
+    post_actived: 'Bài đăng đã được đăng'
   },
   history: {
     add_success: 'Thêm thành công',

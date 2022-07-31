@@ -18,12 +18,12 @@ category.get(
 
 category.post('/', upload.any('category_icon'), categoryController.addCategory)
 
-category.put(
+category.post(
   '/:category_id',
   upload.any('category_icon'),
   categoryController.updateCategory
 )
 
-category.put('/add-details/:category_id', categoryController.addDetails)
+category.post('/add-details/:category_id', categoryController.addDetails)
 
 module.exports = category

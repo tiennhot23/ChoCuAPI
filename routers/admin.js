@@ -13,18 +13,24 @@ const upload = multer({
 
 admin.post('/login', adminController.login)
 
-admin.put(
+admin.post(
   '/lock-account/:username',
   auth.verifyAdmin,
   adminController.lockAccount
 )
 
-admin.put(
+admin.post(
   '/approve-post/:post_id',
   auth.verifyAdmin,
   adminController.approvePost
 )
 
-admin.put('/deny-post/:post_id', auth.verifyAdmin, adminController.denyPost)
+admin.post('/deny-post/:post_id', auth.verifyAdmin, adminController.denyPost)
+
+admin.post(
+  '/delete-post/:post_id',
+  auth.verifyAdmin,
+  adminController.deletePost
+)
 
 module.exports = admin

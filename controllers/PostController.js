@@ -128,4 +128,44 @@ controller.createPost = async (req, res, next) => {
   }
 }
 
+controller.endPost = async (req, res, next) => {
+  let {post_id} = req.params
+  let {user_id} = req.user
+  try {
+    let post = await postModule.getPost({post_id})
+    if (!post) throw new NotFound(messages.post.not_found)
+    if (post.post_state === postState.DELETED)
+      throw new GeneralError(messages.post.post_deleted)
+    if (post.post_state === postState.PENDING)
+      throw new GeneralError(messages.post.post_pending)
+    if (user_id !== post.seller_id) throw new Forbidden()
+    res.success({
+      message: messages.post.post_expired,
+      data: await postModule.update({post_id, post_state: postState.EXPIRED})
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
+controller.repostPost = async (req, res, next) => {
+  let {post_id} = req.params
+  let {user_id} = req.user
+  try {
+    let post = await postModule.getPost({post_id})
+    if (!post) throw new NotFound(messages.post.not_found)
+    if (post.post_state === postState.DELETED)
+      throw new GeneralError(messages.post.post_deleted)
+    if (post.post_state === postState.PENDING)
+      throw new GeneralError(messages.post.post_pending)
+    if (user_id !== post.seller_id) throw new Forbidden()
+    res.success({
+      message: messages.post.post_actived,
+      data: await postModule.update({post_id, post_state: postState.ACTIVE})
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
 module.exports = controller
