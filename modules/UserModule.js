@@ -14,7 +14,7 @@ const userModule = {}
 userModule.getUserInfo = ({user_id}) => {
   return new Promise((resolve, reject) => {
     let query = `select u.user_id, name, phone, email, address, rating, a.role_id, a.active
-    from "Customer" u, "Account" a where user_id=$1`
+    from "Customer" u, "Account" a where u.account_id=a.account_id and user_id=$1`
 
     let params = [user_id]
 

@@ -5,7 +5,8 @@ const {
   userModule,
   fileModule,
   adminModule,
-  postModule
+  postModule,
+  accountModule
 } = require('../modules')
 const {
   BadRequest,
@@ -75,6 +76,20 @@ adminController.denyPost = async (req, res, next) => {
     res.success({
       message: messages.post.post_denied,
       data: await postModule.delete({post_id})
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
+adminController.lockAccount = async (req, res, next) => {
+  let {username} = req.params
+  try {
+    let account = await accountModule.findAccountByUsername({username})
+    if (!account) throw new NotFound(messages.user.account_not_found)
+    res.success({
+      message: messages.user.account_locked,
+      data: await accountModule.lockAccount({account_id: account.account_id})
     })
   } catch (e) {
     next(e)

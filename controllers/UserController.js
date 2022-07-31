@@ -76,6 +76,7 @@ userController.login = async (req, res, next) => {
     if (!account) res.success({message: messages.user.incorrect_account})
     let {account_id, role_id} = account
     if (role_id !== role.customer) throw new Forbidden()
+    if (!account.active) throw new Forbidden(messages.user.account_locked)
     let {user_id} = await userModule.findUserByAccount({account_id})
     let access_token = utils.generateAccessToken({user_id, account_id})
     if (

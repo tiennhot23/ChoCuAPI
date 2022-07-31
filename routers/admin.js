@@ -14,6 +14,12 @@ const upload = multer({
 admin.post('/login', adminController.login)
 
 admin.put(
+  '/lock-account/:username',
+  auth.verifyAdmin,
+  adminController.lockAccount
+)
+
+admin.put(
   '/approve-post/:post_id',
   auth.verifyAdmin,
   adminController.approvePost

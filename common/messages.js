@@ -42,13 +42,14 @@ module.exports = {
     password_reseted: 'Mật khẩu đã được cập nhật',
 
     post_turn_out: 'Hết lượt đăng bài',
+    account_not_found: 'Không tìm thấy tài khoản đăng nhập của người dùng này',
 
     login_success: 'Đăng nhập thành công',
     logout_success: 'Đăng xuất thành công',
     add_success: 'Thêm thành công',
     update_success: 'Cập nhật thành công',
     delete_success: 'Xoá thành công',
-    account_locked: 'Tài khoản này cùng toàn bộ dữ liệu liên qan đã bị xóa.',
+    account_locked: 'Tài khoản này đã bị khoá.',
     registed_success: 'Đăng kí thành công',
     registed_fail: 'Đăng kí thất bại',
     not_found: 'User không tồn tại',

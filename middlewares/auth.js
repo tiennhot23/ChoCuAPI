@@ -2,9 +2,14 @@ const jwt = require('jsonwebtoken')
 
 const UserModule = require('../modules/UserModule')
 const {messages, utils} = require('../common')
-const {Unauthorized, InvalidToken, Forbidden} = require('../utils/Errors')
+const {
+  Unauthorized,
+  InvalidToken,
+  Forbidden,
+  NotFound
+} = require('../utils/Errors')
 const {role} = require('../common/constants')
-const {adminModule} = require('../modules')
+const {adminModule, accountModule} = require('../modules')
 
 const auth = {}
 
@@ -24,6 +29,8 @@ auth.verifyUser = (req, res, next) => {
           throw new InvalidToken()
         if ((await UserModule.getUserInfo({user_id})).role_id !== role.customer)
           throw new Forbidden()
+        if (!(await accountModule.findAccountByAccountID({account_id})).active)
+          throw new Forbidden(messages.user.account_locked)
 
         req.user = {user_id, account_id, access_token}
         next()
