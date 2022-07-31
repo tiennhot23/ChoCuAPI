@@ -5,6 +5,7 @@ const fileModule = require('./FileModule')
 const postModule = require('./PostModule')
 const categoryModule = require('./CategoryModule')
 const detailsModule = require('./DetailsModule')
+const adminModule = require('./AdminModule')
 
 module.exports = {
   otpModule,
@@ -13,5 +14,6 @@ module.exports = {
   fileModule,
   postModule,
   categoryModule,
-  detailsModule
+  detailsModule,
+  adminModule
 }

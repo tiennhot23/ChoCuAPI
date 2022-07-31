@@ -4,6 +4,7 @@ const locationController = require('./LocationController')
 const postController = require('./PostController')
 const categoryController = require('./CategoryController')
 const detailsController = require('./DetailsController')
+const adminController = require('./AdminController')
 
 module.exports = {
   otpController,
@@ -11,5 +12,6 @@ module.exports = {
   locationController,
   postController,
   categoryController,
-  detailsController
+  detailsController,
+  adminController
 }

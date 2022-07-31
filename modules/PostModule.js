@@ -177,4 +177,16 @@ postModule.update = ({post_id, picture, post_state, priority_level}) => {
   })
 }
 
+postModule.delete = ({post_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `delete from "Post" where post_id=$1 and post_state='pending' returning *`
+    let params = [post_id]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows[0])
+    })
+  })
+}
+
 module.exports = postModule

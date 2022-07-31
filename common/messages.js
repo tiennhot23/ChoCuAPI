@@ -86,7 +86,12 @@ module.exports = {
     category_required: 'Yêu cầu mã danh mục',
     details_required: 'Yêu cầu danh sách thông tin chi tiết',
     missing_required_details: 'Thiếu các chi tiết bắt buộc',
-    not_found: 'Không tìm thấy bài đăng này.'
+    not_found: 'Không tìm thấy bài đăng này.',
+    post_approved: 'Bài đăng đã được phê duyệt',
+    post_denied: 'Bài đăng đã bị từ chối',
+    post_deleted: 'Bài đăng đã xoá',
+    post_expired: 'Bài đăng đã hết',
+    post_not_pending: 'Bài đăng không ở trạng thái chờ phê duyệt'
   },
   history: {
     add_success: 'Thêm thành công',
@@ -103,7 +108,8 @@ module.exports = {
     token_invalid: 'Token không khả dụng'
   },
   encrypt: {
-    password_required: 'Yêu cầu password'
+    password_required: 'Yêu cầu password',
+    admin_id_required: 'Yêu cầu mã nhân viên'
   },
   constraint: {
     username_unique: 'Tên đăng nhập/số điên thoại đã tồn tại',

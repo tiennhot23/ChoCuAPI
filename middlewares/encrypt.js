@@ -21,4 +21,15 @@ encrypt.hashPassword = (req, res, next) => {
   next()
 }
 
+encrypt.createAdminPassword = (req, res, next) => {
+  let admin_id = req.body.account_id
+  try {
+    if (!admin_id || helper.isEmptyString(admin_id))
+      throw new BadRequest(messages.encrypt.admin_id_required)
+    req.body.password = bcrypt.hashSync(admin_id, constants.saltRounds)
+  } catch (e) {
+    next(e)
+  }
+}
+
 module.exports = encrypt

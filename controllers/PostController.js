@@ -1,5 +1,5 @@
 const {helper, utils, messages} = require('../common')
-const {role} = require('../common/constants')
+const {role, postState} = require('../common/constants')
 const {
   postModule,
   userModule,

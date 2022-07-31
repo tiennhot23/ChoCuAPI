@@ -79,21 +79,7 @@ userModule.getUserPostTurn = ({user_id}) => {
 userModule.findUserByAccount = ({account_id}) => {
   return new Promise((resolve, reject) => {
     let query = `select u.user_id, name, phone, email, address, rating, a.role_id, a.active
-    from "Customer" u, "Account" a where a.account_id=$1`
-
-    let params = [account_id]
-
-    conn.query(query, params, (err, res) => {
-      if (err) return reject(err)
-      else return resolve(res.rows[0])
-    })
-  })
-}
-
-userModule.findAdminByAccount = ({account_id}) => {
-  return new Promise((resolve, reject) => {
-    let query = `select u.admin_id as user_id, name, email, a.role_id, a.active
-    from "Admin" u, "Account" a where a.account_id=$1`
+    from "Customer" u, "Account" a where u.account_id=a.account_id and a.account_id=$1`
 
     let params = [account_id]
 
