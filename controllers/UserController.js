@@ -64,7 +64,7 @@ userController.createAccount = async (req, res, next) => {
 }
 
 userController.login = async (req, res, next) => {
-  let {username, password, fcm_token} = req.body
+  let {username, password, fcm_token = ''} = req.body
   try {
     if (!username) throw new BadRequest(messages.user.username_required)
     if (!password) throw new BadRequest(messages.user.password_required)
@@ -183,6 +183,41 @@ userController.removeUserPayment = async (req, res, next) => {
         data: [{deleted: true}]
       })
     else throw new GeneralError(messages.common.something_wrong)
+  } catch (e) {
+    next(e)
+  }
+}
+
+userController.subcribeNotify = async (req, res, next) => {
+  let {account_id} = req.user
+  let {fcm_token} = req.body
+  try {
+    if (!fcm_token) throw new BadRequest(messages.user.token_required)
+    res.success({
+      data: [
+        {subcribed: await userModule.addAccountToken({account_id, fcm_token})}
+      ]
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
+userController.unsubcribeNotify = async (req, res, next) => {
+  let {account_id} = req.user
+  let {fcm_token} = req.body
+  try {
+    if (!fcm_token) throw new BadRequest(messages.user.token_required)
+    res.success({
+      data: [
+        {
+          unsubcribed: await userModule.removeAccountToken({
+            account_id,
+            fcm_token
+          })
+        }
+      ]
+    })
   } catch (e) {
     next(e)
   }

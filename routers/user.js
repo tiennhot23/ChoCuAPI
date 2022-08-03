@@ -51,6 +51,13 @@ user.post(
   userController.resetPassword
 )
 
+user.post('/subcribe-notify', auth.verifyUser, userController.subcribeNotify)
+user.post(
+  '/unsubcribe-notify',
+  auth.verifyUser,
+  userController.unsubcribeNotify
+)
+
 user.delete(
   '/remove-user-payment',
   auth.verifyUser,

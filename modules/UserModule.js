@@ -170,24 +170,62 @@ userModule.login = ({username, password}) => {
 
 userModule.addAccountToken = ({account_id, access_token, fcm_token}) => {
   return new Promise((resolve, reject) => {
-    let query = `update "Account" set access_tokens=array_append(access_tokens, $2), fcm_tokens=array_append(fcm_tokens, $3) where account_id=$1 returning account_id`
-    let params = [account_id, access_token, fcm_token]
+    let num = 1
+    let params = []
+
+    let query = `update "Account" set `
+    if (access_token) {
+      query += ` access_tokens=array_append(access_tokens, $${num++}),`
+      params.push(access_token)
+    }
+    if (fcm_token) {
+      query += ` fcm_tokens=array_append(fcm_tokens, $${num++}),`
+      params.push(fcm_token)
+    }
+
+    if (query.endsWith(' ')) {
+      return resolve(false)
+    } else {
+      query = utils.removeCharAt(query, query.length - 1)
+    }
+
+    query += ` where account_id=$${num++} returning account_id`
+    params.push(account_id)
 
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)
-      else return resolve(res.rows[0])
+      else return resolve(true)
     })
   })
 }
 
 userModule.removeAccountToken = ({account_id, access_token, fcm_token}) => {
   return new Promise((resolve, reject) => {
-    let query = `update "Account" set access_tokens=array_remove(access_tokens, $2), fcm_tokens=array_remove(fcm_tokens, $3) where account_id=$1 returning account_id`
-    let params = [account_id, access_token, fcm_token]
+    let num = 1
+    let params = []
+
+    let query = `update "Account" set `
+    if (access_token) {
+      query += ` access_tokens=array_remove(access_tokens, $${num++}),`
+      params.push(access_token)
+    }
+    if (fcm_token) {
+      query += ` fcm_tokens=array_remove(fcm_tokens, $${num++}),`
+      params.push(fcm_token)
+    }
+
+    if (query.endsWith(' ')) {
+      return resolve(false)
+    } else {
+      query = utils.removeCharAt(query, query.length - 1)
+    }
+
+    query += ` where account_id=$${num++} returning account_id`
+    params.push(account_id)
 
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)
-      else return resolve(res.rows[0])
+      else return resolve(true)
     })
   })
 }

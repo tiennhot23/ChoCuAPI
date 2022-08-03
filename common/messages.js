@@ -31,6 +31,7 @@ module.exports = {
     choose_file: 'Vui lòng chọn file'
   },
   user: {
+    token_required: 'Yêu cầu token',
     phone_required: 'Yêu cầu cung cấp số điện thoại',
     phone_invalid: 'Số điện thoại không phù hợp',
     password_required: 'Yêu cầu cung cấp mật khẩu',
@@ -95,6 +96,19 @@ module.exports = {
     post_pending: 'Bài đăng đang chờ duyệt',
     post_not_pending: 'Bài đăng không ở trạng thái chờ phê duyệt',
     post_actived: 'Bài đăng đã được đăng'
+  },
+  deal: {
+    address_required: 'Yêu cầu địa chỉ nhận hàng',
+    price_required: 'Yêu cầu giá giao dịch',
+    not_found: 'Không tìm thấy giao dịch',
+    deal_pending: 'Đang chờ người đăng tin xác nhận giao dịch',
+    deal_not_pending: 'Giao dịch không ở trạng thái chờ xác nhận',
+    deal_confirmed: 'Giao dịch đã được xác nhận',
+    deal_sending: 'Đã gửi hàng',
+    deal_received: 'Đã nhận hàng',
+    deal_canceled: 'Giao dịch đã bị huỷ',
+    deal_unrated: 'Giao dịch chưa được đánh giá',
+    deal_done: 'Giao dịch đã hoàn tất'
   },
   history: {
     add_success: 'Thêm thành công',
