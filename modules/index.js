@@ -7,6 +7,7 @@ const categoryModule = require('./CategoryModule')
 const detailsModule = require('./DetailsModule')
 const adminModule = require('./AdminModule')
 const accountModule = require('./AccountModule')
+const dealModule = require('./DealModule')
 
 module.exports = {
   otpModule,
@@ -17,5 +18,6 @@ module.exports = {
   categoryModule,
   detailsModule,
   adminModule,
-  accountModule
+  accountModule,
+  dealModule
 }

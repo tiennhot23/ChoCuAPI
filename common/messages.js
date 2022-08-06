@@ -98,17 +98,26 @@ module.exports = {
     post_actived: 'Bài đăng đã được đăng'
   },
   deal: {
+    can_not_deal_self: 'Không thể tạo giao dịch với chính mình',
+    rate_forbidden: 'Bạn không được phép đánh giá giao dịch này',
+    can_not_rate: 'Không thể đánh giá nếu chưa nhận hàng',
     address_required: 'Yêu cầu địa chỉ nhận hàng',
     price_required: 'Yêu cầu giá giao dịch',
+    state_required: 'Yêu cầu trạng thái giao dịch',
+    state_incorrect: 'Trạng thái giao dịch không phù hợp',
     not_found: 'Không tìm thấy giao dịch',
     deal_pending: 'Đang chờ người đăng tin xác nhận giao dịch',
     deal_not_pending: 'Giao dịch không ở trạng thái chờ xác nhận',
     deal_confirmed: 'Giao dịch đã được xác nhận',
+    deal_not_confirmed: 'Giao dịch chưa được xác nhận',
     deal_sending: 'Đã gửi hàng',
-    deal_received: 'Đã nhận hàng',
+    deal_received: 'Đã nhận/Chưa đánh giá',
+    deal_not_received: 'Chưa nhận hàng',
     deal_canceled: 'Giao dịch đã bị huỷ',
     deal_unrated: 'Giao dịch chưa được đánh giá',
-    deal_done: 'Giao dịch đã hoàn tất'
+    deal_done: 'Giao dịch đã hoàn tất',
+    rate_numb_required: 'Yêu cầu điểm đánh giá',
+    rate_content_required: 'Yêu cầu nội dung đánh giá'
   },
   history: {
     add_success: 'Thêm thành công',

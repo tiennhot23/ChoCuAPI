@@ -157,7 +157,7 @@ postModule.update = ({post_id, picture, post_state, priority_level}) => {
       params.push(post_state)
     }
     if (priority_level) {
-      query += ` post_state=$${num++},`
+      query += ` priority_level=$${num++},`
       params.push(priority_level)
     }
 

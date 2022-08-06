@@ -5,6 +5,7 @@ const postController = require('./PostController')
 const categoryController = require('./CategoryController')
 const detailsController = require('./DetailsController')
 const adminController = require('./AdminController')
+const dealController = require('./DealController')
 
 module.exports = {
   otpController,
@@ -13,5 +14,6 @@ module.exports = {
   postController,
   categoryController,
   detailsController,
-  adminController
+  adminController,
+  dealController
 }
