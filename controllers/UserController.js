@@ -10,6 +10,17 @@ const {
 
 const userController = {}
 
+userController.getCurrentUserInfo = async (req, res, next) => {
+  let {user_id} = req.user
+  try {
+    res.success({
+      data: await userModule.getUserInfo({user_id})
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
 userController.getUserInfo = async (req, res, next) => {
   let {user_id} = req.params
   try {

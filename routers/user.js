@@ -11,6 +11,8 @@ const upload = multer({
   storage: memoryStorage()
 })
 
+user.get('/', auth.verifyUser, userController.getCurrentUserInfo)
+
 user.get('/:user_id', userController.getUserInfo)
 
 user.get('/user-follow/:user_id', userController.getUserFollowStatistic)

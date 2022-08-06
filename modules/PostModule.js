@@ -13,7 +13,7 @@ postModule.get = ({key_search, location, category}) => {
   let arr_details = category?.details.map((e) => e?.details_id + e?.content)
   return new Promise((resolve, reject) => {
     let num = 1
-    let query = `select post_id, title, default_price, sell_address, picture, time_updated, priority_level
+    let query = `select post_id, title, default_price, sell_address, picture, time_updated, priority_level, online_payment 
       from "Post" p where post_state = 'active' ${
         category?.category_id
           ? ` and post_id in

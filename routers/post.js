@@ -9,7 +9,7 @@ const upload = multer({
 
 const post = express.Router()
 
-post.get('/', postController.getPosts)
+post.post('/', postController.getPosts)
 
 post.get('/:post_id', postController.getPost)
 
