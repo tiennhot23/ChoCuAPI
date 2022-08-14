@@ -11,6 +11,8 @@ const post = express.Router()
 
 post.post('/', postController.getPosts)
 
+post.get('/', auth.verifyUser, postController.getUserPosts)
+
 post.get('/:post_id', postController.getPost)
 
 post.post(

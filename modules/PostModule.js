@@ -32,9 +32,20 @@ postModule.get = ({key_search, location, category}) => {
     let params = []
     if (category?.category_id) params.push(category.category_id)
     if (arr_details && arr_details.length > 0) params.push(arr_details)
-    if (location) params.push(location)
+    if (location) params.push('%' + location)
     if (key_search) params.push(utils.toTSQueryPostgreSyntax(key_search))
 
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows)
+    })
+  })
+}
+
+postModule.getUserPosts = ({user_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `select * from "Post" where seller_id=$1`
+    let params = [user_id]
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)
       else return resolve(res.rows)

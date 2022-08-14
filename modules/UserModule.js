@@ -64,6 +64,21 @@ userModule.getUserPosts = ({user_id, post_state}) => {
   })
 }
 
+userModule.getUserPayments = ({user_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `select u.user_id, p.payment_id, u.user_payment_info, p.title 
+    from "UserPayment" u join "OnlinePayment" p on u.payment_id=p.payment_id 
+    where user_id=$1`
+
+    let params = [user_id]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows)
+    })
+  })
+}
+
 userModule.getUserPostTurn = ({user_id}) => {
   return new Promise((resolve, reject) => {
     let query = `select post_turn from "Customer" where user_id=$1 limit 1`

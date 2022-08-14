@@ -94,6 +94,7 @@ f.upload_multi_with_index = (files, path) => {
       })
 
       blobWriter.on('error', (ignored) => {
+        console.log('error', ignored)
         count += 1
         if (count == array.length) {
           resolve(urls)

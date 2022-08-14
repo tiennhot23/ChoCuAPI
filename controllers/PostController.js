@@ -27,6 +27,17 @@ controller.getPosts = async (req, res, next) => {
   }
 }
 
+controller.getUserPosts = async (req, res, next) => {
+  let {user_id} = req.user
+  try {
+    res.success({
+      data: await postModule.getUserPosts({user_id})
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
 controller.getPost = async (req, res, next) => {
   let {post_id} = req.params
   try {
@@ -57,7 +68,7 @@ controller.createPost = async (req, res, next) => {
     picture = [],
     online_payment,
     category_id,
-    details
+    details = []
   } = req.body
   let isUploadFile =
     req.files && req.files.length > 0 && req.files[0].fieldname === 'picture'
