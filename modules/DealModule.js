@@ -6,9 +6,9 @@ const dealModule = {}
 
 dealModule.getSellingDeals = ({seller_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select p.post_id, p.seller_id, p.title, p.picture, p.time_updated, 
-    d.deal_id, d.buyer_id, d.deal_state, d.receive_address, d.deal_price, d.online_deal 
-    from "Deal" d join "Post" p on d.post_id=p.post_id where p.seller_id=$1`
+    let query = `select d.*, r.rate_numb from "Rate" as r right join (select p.post_id, p.seller_id, p.title, p.picture, d.time_created,
+      d.deal_id, d.buyer_id, d.deal_state, d.receive_address, d.deal_price, d.online_deal
+      from "Deal" d join "Post" p on d.post_id=p.post_id where p.seller_id=$1) as d on r.deal_id=d.deal_id`
     let params = [seller_id]
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)
@@ -19,9 +19,9 @@ dealModule.getSellingDeals = ({seller_id}) => {
 
 dealModule.getBuyingDeals = ({buyer_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select p.post_id, p.seller_id, p.title, p.picture, p.time_updated, 
-    d.deal_id, d.buyer_id, d.deal_state, d.receive_address, d.deal_price, d.online_deal 
-    from "Deal" d join "Post" p on d.post_id=p.post_id where d.buyer_id=$1`
+    let query = `select d.*, r.rate_numb from "Rate" as r right join (select p.post_id, p.seller_id, p.title, p.picture, d.time_created,
+      d.deal_id, d.buyer_id, d.deal_state, d.receive_address, d.deal_price, d.online_deal
+      from "Deal" d join "Post" p on d.post_id=p.post_id where d.buyer_id=$1) as d on r.deal_id=d.deal_id`
     let params = [buyer_id]
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)
@@ -32,7 +32,7 @@ dealModule.getBuyingDeals = ({buyer_id}) => {
 
 dealModule.getDeal = ({deal_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select p.post_id, p.seller_id, p.title, p.picture, p.time_updated, 
+    let query = `select p.post_id, p.seller_id, p.title, p.picture, d.time_created, 
       d.deal_id, d.buyer_id, d.deal_state, d.receive_address, d.deal_price, d.online_deal 
       from "Deal" d join "Post" p on d.post_id=p.post_id where d.deal_id=$1`
     let params = [deal_id]

@@ -48,8 +48,16 @@ dealController.getDeal = async (req, res, next) => {
     if (!deal) throw new NotFound(messages.deal.not_found)
     if (user_id !== deal.buyer_id && user_id !== deal.seller_id)
       throw new Forbidden(messages.auth.forbidden)
+    const buyer = await userModule.getUserInfo({user_id: deal.buyer_id})
+    const seller = await userModule.getUserInfo({user_id: deal.seller_id})
+    const rating = await dealModule.getRate({deal_id})
     res.success({
-      data: await dealModule.getDeal({deal_id})
+      data: {
+        deal,
+        buyer,
+        seller,
+        rating
+      }
     })
   } catch (e) {
     next(e)
@@ -133,7 +141,7 @@ dealController.updateDealState = async (req, res, next) => {
         }
       }
       case dealState.RECEIVED: {
-        if (deal.deal_state === dealState.CONFIRMED) {
+        if (deal.deal_state === dealState.SENDING) {
           if (user_id !== deal.buyer_id)
             throw new Forbidden(messages.auth.forbidden)
           return res.success({
@@ -141,7 +149,7 @@ dealController.updateDealState = async (req, res, next) => {
             data: await dealModule.update({deal_id, deal_state})
           })
         } else {
-          throw new GeneralError(messages.deal.deal_not_confirmed)
+          throw new GeneralError(messages.deal.deal_not_send)
         }
       }
       case dealState.DONE: {

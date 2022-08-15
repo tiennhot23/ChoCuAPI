@@ -1,5 +1,6 @@
 const express = require('express')
 const cors = require('cors')
+const paypal = require('paypal-rest-sdk')
 
 require('dotenv').config()
 
@@ -29,6 +30,58 @@ function postTrimmer(req, res, next) {
   }
   next()
 }
+
+paypal.configure({
+  mode: 'sandbox', //sandbox or live
+  client_id: process.env.PAYPAL_CLIENT_ID,
+  client_secret: process.env.PAYPAL_CLIENT_SECRET
+})
+
+app.get('/paypal', (req, res) => {
+  var create_payment_json = {
+    intent: 'sale',
+    payer: {
+      payment_method: 'paypal'
+    },
+    redirect_urls: {
+      return_url: 'http://192.168.1.7:3000/success',
+      cancel_url: 'http://192.168.1.7:3000/cancel'
+    },
+    transactions: [
+      {
+        item_list: {
+          items: [
+            {
+              name: 'item',
+              sku: 'item',
+              price: '1.00',
+              currency: 'USD',
+              quantity: 1
+            }
+          ]
+        },
+        amount: {
+          currency: 'USD',
+          total: '1.00'
+        },
+        description: 'This is the payment description.'
+      }
+    ]
+  }
+
+  paypal.payment.create(create_payment_json, function (error, payment) {
+    if (error) {
+      throw error
+    } else {
+      console.log('Create Payment Response')
+      console.log(payment)
+      res.redirect(payment.links[1].href)
+    }
+  })
+})
+
+app.get('/success', (req, res) => res.send('Success'))
+app.get('/cancel', (req, res) => res.send('Cancel'))
 
 app.use(postTrimmer)
 

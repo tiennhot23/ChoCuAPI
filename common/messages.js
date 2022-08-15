@@ -111,6 +111,7 @@ module.exports = {
     deal_confirmed: 'Giao dịch đã được xác nhận',
     deal_not_confirmed: 'Giao dịch chưa được xác nhận',
     deal_sending: 'Đã gửi hàng',
+    deal_not_send: 'Hàng chưa được gửi',
     deal_received: 'Đã nhận/Chưa đánh giá',
     deal_not_received: 'Chưa nhận hàng',
     deal_canceled: 'Giao dịch đã bị huỷ',
