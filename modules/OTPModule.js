@@ -31,7 +31,7 @@ otp.createOTP = (phone) => {
   let verify_code = utils.getRandomInt(100000, 999999)
   let time_expired = utils.addMinutes(3)
   return new Promise((resolve, reject) => {
-    let query = `insert into "OTP" (phone, otp_code, time_expired, verified, verify_code) values ($1, $2, $3, $4, $5) returning otp_code, time_expired`
+    let query = `insert into "OTP" (phone, otp_code, time_expired, verified, verify_code) values ($1, $2, $3, $4, $5) returning *`
 
     var params = [phone, otp_code, time_expired, false, verify_code]
 
@@ -52,7 +52,7 @@ otp.resetOTP = (phone) => {
   let verify_code = utils.getRandomInt(100000, 999999)
   let time_expired = utils.addMinutes(3)
   return new Promise((resolve, reject) => {
-    let query = `update "OTP" set otp_code=$2, time_expired=$3, verified=$4, verify_code=$5 where phone = $1 returning otp_code, time_expired`
+    let query = `update "OTP" set otp_code=$2, time_expired=$3, verified=$4, verify_code=$5 where phone = $1 returning *`
 
     var params = [phone, otp_code, time_expired, false, verify_code]
 
@@ -70,7 +70,7 @@ otp.resetOTP = (phone) => {
  */
 otp.verifyOTP = (phone) => {
   return new Promise((resolve, reject) => {
-    let query = `update "OTP" set verified=true where phone = $1 returning verify_code`
+    let query = `update "OTP" set verified=true where phone = $1 returning *`
     conn.query(query, [phone], (err, res) => {
       if (err) return reject(err)
       else return resolve(res.rows)

@@ -39,7 +39,10 @@ otp.verifyOTP = async (req, res, next) => {
         data: await otpModule.verifyOTP(phone),
         message: messages.otp.otp_verified
       })
-    else return res.success({data: [], message: messages.otp.otp_expired})
+    else {
+      await otpModule.deleteOTP(phone)
+      throw new BadRequest(messages.otp.otp_expired)
+    }
   } catch (e) {
     next(e)
   }

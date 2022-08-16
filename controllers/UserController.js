@@ -66,12 +66,13 @@ userController.getUserPayments = async (req, res, next) => {
 }
 
 userController.createAccount = async (req, res, next) => {
-  let {phone, password} = req.body
+  let {phone, password, verify_code} = req.body
   try {
     if (!phone) throw new BadRequest(messages.user.phone_required)
     if (!helper.isValidatePhone(phone))
       throw new BadRequest(messages.user.phone_invalid)
 
+    if (verify_code) await otpModule.deleteOTP(phone)
     let {account_id} = await userModule.createAccount({phone, password})
     if (account_id) {
       await otpModule.deleteOTP(phone)
@@ -135,14 +136,15 @@ userController.resetPassword = async (req, res, next) => {
   let {password, phone, verify_code} = req.body
   let {account_id} = req.user || {}
   try {
-    if (!account_id)
-      account_id = (await userModule.findAccountByUsername({username: phone}))
-        .account_id
+    if (verify_code) await otpModule.deleteOTP(phone)
+    if (!account_id) {
+      let u = await userModule.findAccountByUsername({username: phone})
+      account_id = u?.account_id
+    }
 
     if (!account_id) throw new NotFound(messages.user.not_found)
 
     if (await userModule.updatePassword({account_id, password})) {
-      if (verify_code) await otpModule.deleteOTP(phone)
       res.success({
         message: messages.user.password_updated,
         data: [{updated: true}]
