@@ -120,4 +120,20 @@ dealModule.getRate = ({deal_id}) => {
   })
 }
 
+dealModule.getSeller = ({deal_id}) => {
+  return new Promise((resolve, reject) => {
+    //coalesce: replace value with another if null
+    let query = `select u.user_id, u.name, u.avatar, u.phone, u.email, u.address, u.rating, 
+    coalesce((select sum(rate_numb) from "Rate" where deal_id=$1 group by rate_numb) , 0) as rate_count
+    from "Customer" u  where user_id in
+    (select seller_id from "Post" where post_id in
+    (select post_id from "Deal" where deal_id=$1 limit 1) limit 1)`
+    let params = [deal_id]
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows[0])
+    })
+  })
+}
+
 module.exports = dealModule

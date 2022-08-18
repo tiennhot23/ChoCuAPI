@@ -44,10 +44,10 @@ userController.getUserFollowStatistic = async (req, res, next) => {
 }
 
 userController.getUserPosts = async (req, res, next) => {
-  let {user_id, post_state} = req.params
+  let {user_id} = req.params
   try {
     res.success({
-      data: await userModule.getUserPosts({user_id, post_state})
+      data: await userModule.getUserPosts({user_id})
     })
   } catch (e) {
     next(e)

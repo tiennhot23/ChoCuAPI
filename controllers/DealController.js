@@ -1,4 +1,4 @@
-const {helper, utils, messages} = require('../common')
+const {helper, utils, messages, constants} = require('../common')
 const {role, postState, dealState} = require('../common/constants')
 const {
   otpModule,
@@ -190,6 +190,20 @@ dealController.rateDeal = async (req, res, next) => {
 
     let rate = await dealModule.rateDeal({deal_id, rate_numb, rate_content})
     if (rate) await dealModule.update({deal_id, deal_state: dealState.DONE})
+
+    let seller = await dealModule.getSeller({deal_id})
+    if (seller) {
+      let new_user_rating =
+        (seller.rating * (seller.rate_count - 1) + rate.rate_numb) /
+        seller.rate_count
+      new_user_rating = new_user_rating.toFixed(1)
+      seller.rating = Number(new_user_rating)
+      await userModule.updateRating({
+        user_id: seller.user_id,
+        rating: seller.rating
+      })
+    }
+
     res.success({
       data: rate
     })

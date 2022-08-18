@@ -50,12 +50,12 @@ userModule.getUserFollows = ({user_id}) => {
   })
 }
 
-userModule.getUserPosts = ({user_id, post_state}) => {
+userModule.getUserPosts = ({user_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select post_id, title, default_price, sell_address, picture, time_created, time_updated 
-    from "Post" where seller_id=$1 and post_state=$2 order by time_updated`
+    let query = `select post_id, title, default_price, sell_address, picture, time_created, time_updated, post_state 
+    from "Post" where seller_id=$1 and (post_state='active' or post_state='expired') order by time_updated`
 
-    let params = [user_id, post_state]
+    let params = [user_id]
 
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)
@@ -291,6 +291,18 @@ userModule.updatePassword = ({account_id, password}) => {
   return new Promise((resolve, reject) => {
     let query = `update "Account" set password=$2 where account_id=$1 and active=true`
     let params = [account_id, password]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(true)
+    })
+  })
+}
+
+userModule.updateRating = ({user_id, rating}) => {
+  return new Promise((resolve, reject) => {
+    let query = `update "Customer" set rating=$2 where user_id=$1`
+    let params = [user_id, rating]
 
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)

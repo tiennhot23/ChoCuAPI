@@ -17,7 +17,7 @@ user.get('/:user_id', userController.getUserInfo)
 
 user.get('/user-follow/:user_id', userController.getUserFollowStatistic)
 
-user.get('/user-posts/:post_state/:user_id', userController.getUserPosts)
+user.get('/user-posts/:user_id', userController.getUserPosts)
 
 user.get('/user-payments/:user_id', userController.getUserPayments)
 
