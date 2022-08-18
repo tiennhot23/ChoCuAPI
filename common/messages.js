@@ -13,6 +13,13 @@ module.exports = {
     otp_verified: 'Xác thực OTP thành công',
     otp_created: 'Tạo mã OTP thành công'
   },
+  notify: {
+    notify_detail_id_required: 'Yêu cầu notify_detail_id',
+    notify_type_required: 'Yêu cầu notify_type',
+    title_required: 'Yêu cầu title',
+    message_required: 'Yêu cầu message',
+    user_fcm_token_required: 'Yêu cầu user_fcm_token'
+  },
   category: {
     id_required: 'Yêu cầu cung cấp mã danh mục',
     title_required: 'Yêu cầu cung cấp tiểu đề danh mục',

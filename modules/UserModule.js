@@ -13,7 +13,7 @@ const userModule = {}
  */
 userModule.getUserInfo = ({user_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select u.user_id, name, avatar, phone, email, address, rating, a.role_id, a.active
+    let query = `select u.user_id, name, avatar, phone, email, address, rating, a.role_id, a.active, a.fcm_tokens 
     from "Customer" u, "Account" a where u.account_id=a.account_id and user_id=$1`
 
     let params = [user_id]
@@ -27,8 +27,8 @@ userModule.getUserInfo = ({user_id}) => {
 
 userModule.getUserFollows = ({user_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select user_follower_id=$1 as is_following, count(*) from "Follower" 
-    where user_follower_id=$1 or user_following_id=$1 group by user_follower_id=$1`
+    let query = `select user_following_id=$1 as is_following, count(*) from "Follower" 
+    where user_follower_id=$1 or user_following_id=$1 group by user_following_id=$1`
 
     let params = [user_id]
 
@@ -39,12 +39,42 @@ userModule.getUserFollows = ({user_id}) => {
         let user_following = 0
         res.rows.map((item) => {
           if (item.is_following) {
-            user_following = item.count
+            user_following = Number(item.count)
           } else {
-            user_follower = item.count
+            user_follower = Number(item.count)
           }
         })
         return resolve({user_follower, user_following})
+      }
+    })
+  })
+}
+
+userModule.getUserFollowing = ({user_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `select user_follower_id from "Follower" where user_following_id=$1`
+
+    let params = [user_id]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else {
+        return resolve(res.rows)
+      }
+    })
+  })
+}
+
+userModule.getUserFollower = ({user_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `select user_following_id from "Follower" where user_follower_id=$1`
+
+    let params = [user_id]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else {
+        return resolve(res.rows)
       }
     })
   })

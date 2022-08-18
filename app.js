@@ -16,6 +16,7 @@ const details = require('./routers/details')
 const admin = require('./routers/admin')
 const deal = require('./routers/deal')
 const payment = require('./routers/payment')
+const notify = require('./routers/notify')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -36,7 +37,6 @@ paypal.configure({
   client_id: process.env.PAYPAL_CLIENT_ID,
   client_secret: process.env.PAYPAL_CLIENT_SECRET
 })
-
 app.get('/paypal', (req, res) => {
   var create_payment_json = {
     intent: 'sale',
@@ -79,7 +79,6 @@ app.get('/paypal', (req, res) => {
     }
   })
 })
-
 app.get('/success', (req, res) => res.send('Success'))
 app.get('/cancel', (req, res) => res.send('Cancel'))
 
@@ -97,6 +96,7 @@ app.use('/details', details)
 app.use('/upload', upload)
 app.use('/admin', admin)
 app.use('/payment', payment)
+app.use('/notify', notify)
 app.use('/', (req, res, next) => {
   res.json({message: 'HELLO STRANGER'})
 })

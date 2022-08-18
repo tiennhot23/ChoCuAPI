@@ -4,7 +4,8 @@ const {
   postModule,
   userModule,
   categoryModule,
-  fileModule
+  fileModule,
+  notifyModule
 } = require('../modules')
 const {
   BadRequest,
@@ -133,6 +134,19 @@ controller.createPost = async (req, res, next) => {
       res.success({
         data: post
       })
+      let followers = await userModule.getUserFollower({user_id: user_id})
+      let followers_token = []
+      followers.map((e) => {
+        followers_token.concat(e.fcm_tokens)
+      })
+      await notifyModule.send({
+        notify_detail_id: post.post_id,
+        notify_type: 'post',
+        title: 'Tin đăng mới',
+        message: `Người mà bạn đang theo dõi vừa đăng tin mới. Vào xem ngay nào`,
+        user_fcm_token: followers_token
+      })
+      return
     } else throw new GeneralError(messages.common.something_wrong)
   } catch (e) {
     next(e)
