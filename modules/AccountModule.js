@@ -34,7 +34,7 @@ accountModule.findAccountByAccountID = ({account_id}) => {
 
 accountModule.lockAccount = ({account_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `update "Account" set active=false, access_tokens={}, fcm_tokens={} where account_id=$1 returning *`
+    let query = `update "Account" set active=false, access_tokens='{}', fcm_tokens='{}' where account_id=$1 returning *`
 
     let params = [account_id]
 

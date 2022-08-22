@@ -1,7 +1,11 @@
 const express = require('express')
 const {memoryStorage} = require('multer')
 const multer = require('multer')
-const {otpController, adminController} = require('../controllers')
+const {
+  otpController,
+  adminController,
+  userController
+} = require('../controllers')
 const auth = require('../middlewares/auth')
 const encrypt = require('../middlewares/encrypt')
 
@@ -11,7 +15,10 @@ const upload = multer({
   storage: memoryStorage()
 })
 
+admin.get('/pending-post', adminController.getPendingPost)
+
 admin.post('/login', adminController.login)
+admin.post('/logout', auth.verifyAdmin, userController.logout)
 
 admin.post(
   '/lock-account/:username',

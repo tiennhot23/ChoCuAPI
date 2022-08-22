@@ -5,7 +5,8 @@ const {
   userModule,
   categoryModule,
   fileModule,
-  notifyModule
+  notifyModule,
+  reportModule
 } = require('../modules')
 const {
   BadRequest,
@@ -54,6 +55,36 @@ controller.getPost = async (req, res, next) => {
         category,
         details
       }
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
+controller.getAllRating = async (req, res, next) => {
+  let {post_id} = req.params
+  try {
+    let post = await postModule.getPost({post_id})
+    if (!post) throw new NotFound(messages.post.not_found)
+    let r = await postModule.getAllRating({post_id})
+    r = r.map((e) => {
+      return {
+        user: {
+          user_id: e.user_id,
+          name: e.name,
+          avatar: e.avatar,
+          phone: e.phone
+        },
+        rating: {
+          deal_id: e.deal_id,
+          rate_numb: e.rate_numb,
+          time_created: e.time_created,
+          rate_content: e.rate_content
+        }
+      }
+    })
+    res.success({
+      data: r
     })
   } catch (e) {
     next(e)
@@ -134,18 +165,18 @@ controller.createPost = async (req, res, next) => {
       res.success({
         data: post
       })
-      let followers = await userModule.getUserFollower({user_id: user_id})
-      let followers_token = []
-      followers.map((e) => {
-        followers_token.concat(e.fcm_tokens)
-      })
-      await notifyModule.send({
-        notify_detail_id: post.post_id,
-        notify_type: 'post',
-        title: 'Tin đăng mới',
-        message: `Người mà bạn đang theo dõi vừa đăng tin mới. Vào xem ngay nào`,
-        user_fcm_token: followers_token
-      })
+      // let followers = await userModule.getUserFollower({user_id: user_id})
+      // let followers_token = []
+      // followers.map((e) => {
+      //   followers_token.concat(e.fcm_tokens)
+      // })
+      // await notifyModule.send({
+      //   notify_detail_id: post.post_id,
+      //   notify_type: 'post',
+      //   title: 'Tin đăng mới',
+      //   message: `Người mà bạn đang theo dõi vừa đăng tin mới. Vào xem ngay nào`,
+      //   user_fcm_token: followers_token
+      // })
       return
     } else throw new GeneralError(messages.common.something_wrong)
   } catch (e) {
@@ -187,6 +218,18 @@ controller.repostPost = async (req, res, next) => {
     res.success({
       message: messages.post.post_actived,
       data: await postModule.update({post_id, post_state: postState.ACTIVE})
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
+controller.reportPost = async (req, res, next) => {
+  let {post_id} = req.params
+  let {contact_info = '', content = ''} = req.body
+  try {
+    res.success({
+      data: await reportModule.createReport({post_id, contact_info, content})
     })
   } catch (e) {
     next(e)

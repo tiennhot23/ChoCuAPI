@@ -99,6 +99,30 @@ cateModule.add_details = ({category_id, details_id, required}) => {
   })
 }
 
+cateModule.add_multi_details = ({category_id, details}) => {
+  return new Promise((resolve, reject) => {
+    if (details.length === 0) resolve([])
+
+    let query = `insert into "CateDetails" (category_id, details_id, required) values `
+
+    details.map((e) => {
+      query += `(${category_id}, ${e.details_id}, ${
+        e.required ? e.required : false
+      }), `
+    })
+    query = utils.removeCharAt(query, query.length - 2)
+    query += ' returning *'
+    console.log(query)
+
+    let params = []
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows)
+    })
+  })
+}
+
 cateModule.check_required_details = ({category_id, details}) => {
   return new Promise((resolve, reject) => {
     let query = `select details_id from "CateDetails" where category_id=$1 and required=true`

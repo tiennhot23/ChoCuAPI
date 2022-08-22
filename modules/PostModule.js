@@ -75,6 +75,20 @@ postModule.getPost = ({post_id}) => {
   })
 }
 
+postModule.getAllRating = ({post_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `select u.user_id, u.name, u.avatar, u.phone, r.* from "Rate" r, (
+      select c.*, d.deal_id from "Customer" c join "Deal" d on c.user_id = d.buyer_id
+      where post_id=$1 and deal_state='done') u where r.deal_id = u.deal_id`
+    let params = [post_id]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows)
+    })
+  })
+}
+
 postModule.getPostCate = ({post_id}) => {
   return new Promise((resolve, reject) => {
     let query = `select * from "Category" 

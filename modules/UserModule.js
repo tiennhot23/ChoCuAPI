@@ -123,7 +123,7 @@ userModule.getUserPostTurn = ({user_id}) => {
 
 userModule.findUserByAccount = ({account_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select u.user_id, name, phone, email, address, rating, a.role_id, a.active
+    let query = `select u.user_id, name, phone, email, address, rating, a.role_id, a.active, a.active, a.fcm_tokens 
     from "Customer" u, "Account" a where u.account_id=a.account_id and a.account_id=$1`
 
     let params = [account_id]

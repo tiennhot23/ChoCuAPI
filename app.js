@@ -17,6 +17,7 @@ const admin = require('./routers/admin')
 const deal = require('./routers/deal')
 const payment = require('./routers/payment')
 const notify = require('./routers/notify')
+const mail = require('./middlewares/mail')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -81,12 +82,16 @@ app.get('/paypal', (req, res) => {
 })
 app.get('/success', (req, res) => res.send('Success'))
 app.get('/cancel', (req, res) => res.send('Cancel'))
+// app.get('/gmail', (req, res) => {
+//   mail.sendMail('imagesaitama@gmail.com', 'TEST', 'Noij dug')
+//   res.send('asd')
+// })
 
 app.use(postTrimmer)
 
 app.use(responseHandling)
 
-app.use('/location', location)
+// app.use('/location', location)
 app.use('/otp', otp)
 app.use('/user', user)
 app.use('/post', post)

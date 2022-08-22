@@ -6,6 +6,19 @@ const {isEmptyArray} = require('../common/helper')
 
 const adminModule = {}
 
+adminModule.getPendingPost = () => {
+  return new Promise((resolve, reject) => {
+    let query = `select * from "Post" where post_state='pending'`
+
+    let params = []
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows)
+    })
+  })
+}
+
 adminModule.findAdminByAccount = ({account_id}) => {
   return new Promise((resolve, reject) => {
     let query = `select admin_id, name, email, a.role_id, a.active

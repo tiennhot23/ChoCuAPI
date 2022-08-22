@@ -112,19 +112,31 @@ controller.updateCategory = async (req, res, next) => {
 
 controller.addDetails = async (req, res, next) => {
   let {category_id} = req.params
-  let {details_id, required} = req.body
+  let {details} = req.body
   try {
-    if (!helper.isValidObject(details_id))
+    if (!helper.isArray(details))
       throw new BadRequest(messages.category.details_id_required)
 
-    if (await cateModule.add_details({category_id, details_id, required}))
-      res.success({
-        message: messages.common.add_success,
-        data: [{added: true}]
-      })
+    res.success({
+      message: messages.common.add_success,
+      data: await cateModule.add_multi_details({category_id, details})
+    })
   } catch (e) {
     next(e)
   }
+  // let {details_id, required} = req.body
+  // try {
+  //   if (!helper.isValidObject(details_id))
+  //     throw new BadRequest(messages.category.details_id_required)
+
+  //   if (await cateModule.add_details({category_id, details_id, required}))
+  //     res.success({
+  //       message: messages.common.add_success,
+  //       data: [{added: true}]
+  //     })
+  // } catch (e) {
+  //   next(e)
+  // }
 }
 
 module.exports = controller
