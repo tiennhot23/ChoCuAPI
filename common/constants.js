@@ -16,7 +16,7 @@ const postState = {
 }
 const dealState = {
   PENDING: 'pending',
-  UNPAID: 'unpaid',
+  PAID: 'paid',
   CONFIRMED: 'confirmed',
   SENDING: 'sending',
   RECEIVED: 'received',

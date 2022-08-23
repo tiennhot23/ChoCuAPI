@@ -117,6 +117,8 @@ module.exports = {
     deal_not_pending: 'Giao dịch không ở trạng thái chờ xác nhận',
     deal_confirmed: 'Giao dịch đã được xác nhận',
     deal_not_confirmed: 'Giao dịch chưa được xác nhận',
+    deal_paid: 'Giao dịch đã được thanh toán',
+    deal_not_paid: 'Giao dịch chưa được thanh toán',
     deal_sending: 'Đã gửi hàng',
     deal_not_send: 'Hàng chưa được gửi',
     deal_received: 'Đã nhận/Chưa đánh giá',

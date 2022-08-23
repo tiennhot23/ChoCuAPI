@@ -39,6 +39,13 @@ paypal.configure({
   client_secret: process.env.PAYPAL_CLIENT_SECRET
 })
 app.get('/paypal', (req, res) => {
+  let {
+    item_name = 'ao',
+    price = 20000,
+    recipient_name = 'Brian Robinson',
+    address = 'Thu Duc'
+  } = req.query
+  price = (price / 23430).toFixed(2)
   var create_payment_json = {
     intent: 'sale',
     payer: {
@@ -53,17 +60,25 @@ app.get('/paypal', (req, res) => {
         item_list: {
           items: [
             {
-              name: 'item',
+              name: item_name,
               sku: 'item',
-              price: '1.00',
+              price: price,
               currency: 'USD',
               quantity: 1
             }
-          ]
+          ],
+          shipping_address: {
+            recipient_name: recipient_name,
+            line1: address,
+            line2: '',
+            city: 'Viet Nam',
+            country_code: 'VN',
+            phone: '011862212345678'
+          }
         },
         amount: {
           currency: 'USD',
-          total: '1.00'
+          total: price
         },
         description: 'This is the payment description.'
       }
@@ -91,7 +106,7 @@ app.use(postTrimmer)
 
 app.use(responseHandling)
 
-// app.use('/location', location)
+app.use('/location', location)
 app.use('/otp', otp)
 app.use('/user', user)
 app.use('/post', post)
