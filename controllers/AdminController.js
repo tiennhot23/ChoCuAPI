@@ -7,7 +7,8 @@ const {
   adminModule,
   postModule,
   accountModule,
-  notifyModule
+  notifyModule,
+  servicesModule
 } = require('../modules')
 const mail = require('../middlewares/mail')
 const {
@@ -23,6 +24,17 @@ adminController.getPendingPost = async (req, res, next) => {
   try {
     return res.success({
       data: await adminModule.getPendingPost()
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
+adminController.getServicesRevenue = async (req, res, next) => {
+  const {fromTime, toTime} = req.body
+  try {
+    return res.success({
+      data: await servicesModule.getUserBuyServices({fromTime, toTime})
     })
   } catch (e) {
     next(e)

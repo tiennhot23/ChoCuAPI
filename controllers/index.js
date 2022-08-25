@@ -8,6 +8,7 @@ const adminController = require('./AdminController')
 const dealController = require('./DealController')
 const paymentController = require('./PaymentController')
 const notifyController = require('./NotifyController')
+const servicesController = require('./ServicesController')
 
 module.exports = {
   otpController,
@@ -19,5 +20,6 @@ module.exports = {
   adminController,
   dealController,
   paymentController,
-  notifyController
+  notifyController,
+  servicesController
 }

@@ -18,6 +18,7 @@ const deal = require('./routers/deal')
 const payment = require('./routers/payment')
 const notify = require('./routers/notify')
 const mail = require('./middlewares/mail')
+const services = require('./routers/services')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -117,6 +118,7 @@ app.use('/upload', upload)
 app.use('/admin', admin)
 app.use('/payment', payment)
 app.use('/notify', notify)
+app.use('/services', services)
 app.use('/', (req, res, next) => {
   res.json({message: 'HELLO STRANGER'})
 })

@@ -1,6 +1,11 @@
 const {helper, utils, messages} = require('../common')
 const {role} = require('../common/constants')
-const {otpModule, userModule, fileModule} = require('../modules')
+const {
+  otpModule,
+  userModule,
+  fileModule,
+  servicesModule
+} = require('../modules')
 const {
   BadRequest,
   GeneralError,
@@ -207,6 +212,22 @@ userController.removeUserPayment = async (req, res, next) => {
         data: [{deleted: true}]
       })
     else throw new GeneralError(messages.common.something_wrong)
+  } catch (e) {
+    next(e)
+  }
+}
+
+userController.addUserServices = async (req, res, next) => {
+  let {user_id} = req.user
+  let {service_id, price, post_turn} = req.body
+  try {
+    if (await servicesModule.addUserServices({user_id, service_id, price})) {
+      await userModule.increasePostTurn({user_id, extra_post_turn: post_turn})
+      res.success({
+        message: messages.user.add_success,
+        data: [{added: true}]
+      })
+    } else throw new GeneralError(messages.common.something_wrong)
   } catch (e) {
     next(e)
   }

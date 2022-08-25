@@ -41,6 +41,14 @@ user.post(
 
 user.post('/add-user-payment', auth.verifyUser, userController.addUserPayment)
 
+user.post('/add-user-service', auth.verifyUser, userController.addUserServices)
+
+user.post(
+  '/remove-user-payment',
+  auth.verifyUser,
+  userController.removeUserPayment
+)
+
 user.post(
   '/update-info',
   auth.verifyUser,
@@ -60,12 +68,6 @@ user.post(
   '/unsubcribe-notify',
   auth.verifyUser,
   userController.unsubcribeNotify
-)
-
-user.delete(
-  '/remove-user-payment',
-  auth.verifyUser,
-  userController.removeUserPayment
 )
 
 module.exports = user

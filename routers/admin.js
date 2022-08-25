@@ -17,6 +17,8 @@ const upload = multer({
 
 admin.get('/pending-post', adminController.getPendingPost)
 
+admin.get('/service-revenue', adminController.getServicesRevenue)
+
 admin.post('/login', adminController.login)
 admin.post('/logout', auth.verifyAdmin, userController.logout)
 

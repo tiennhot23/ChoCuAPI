@@ -13,7 +13,7 @@ const userModule = {}
  */
 userModule.getUserInfo = ({user_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select u.user_id, name, avatar, phone, email, address, rating, a.role_id, a.active, a.fcm_tokens 
+    let query = `select u.user_id, name, avatar, phone, email, address, rating, post_turn, a.role_id, a.active, a.fcm_tokens 
     from "Customer" u, "Account" a where u.account_id=a.account_id and user_id=$1`
 
     let params = [user_id]
@@ -123,7 +123,7 @@ userModule.getUserPostTurn = ({user_id}) => {
 
 userModule.findUserByAccount = ({account_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select u.user_id, name, phone, email, address, rating, a.role_id, a.active, a.active, a.fcm_tokens 
+    let query = `select u.user_id, name, phone, email, address, rating, a.role_id, a.active, post_turn, a.active, a.fcm_tokens 
     from "Customer" u, "Account" a where u.account_id=a.account_id and a.account_id=$1`
 
     let params = [account_id]
@@ -304,7 +304,7 @@ userModule.updateInfo = ({user_id, name, avatar, email, address}) => {
       query = utils.removeCharAt(query, query.length - 1)
     }
 
-    query += ` where user_id=$${num} returning user_id, name, avatar, phone, email, address`
+    query += ` where user_id=$${num} returning user_id, name, avatar, phone, email, address, post_turn `
     params.push(user_id)
 
     conn.query(query, params, (err, res) => {
