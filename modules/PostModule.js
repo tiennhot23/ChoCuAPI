@@ -7,14 +7,14 @@ const postModule = {}
 /**
  *
  * @param {*} {key_search, location, category {category_id, details: [{details_id, content}]}}
- * @returns post_id, title, default_price, sell_address, picture, time_updated, priority_level
+ * @returns post_id, title, default_price, sell_address, picture, time_updated
  */
 postModule.get = ({key_search, location, category}) => {
   let arr_details = category?.details.filter((e) => e?.content !== '')
   console.log(arr_details)
   return new Promise((resolve, reject) => {
     let num = 1
-    let query = `select post_id, title, default_price, sell_address, picture, time_updated, priority_level, online_payment 
+    let query = `select post_id, title, default_price, sell_address, picture, time_created, time_updated, online_payment 
       from "Post" p where post_state = 'active' ${
         category?.category_id
           ? ` and post_id in
@@ -33,7 +33,7 @@ postModule.get = ({key_search, location, category}) => {
           : ``
       } ${location ? ` and sell_address ilike $${num++} ` : ``} ${
       key_search ? ` and keyword @@ to_tsquery($${num++}) ` : ``
-    } order by priority_level desc, time_updated desc`
+    } order by time_created desc`
 
     let params = []
     if (category?.category_id) params.push(category.category_id)
@@ -64,7 +64,7 @@ postModule.getUserPosts = ({user_id}) => {
 postModule.getPost = ({post_id}) => {
   return new Promise((resolve, reject) => {
     let query = `select post_id, seller_id, title, default_price, sell_address, post_state, 
-      description, picture, time_created, time_updated, priority_level, online_payment 
+      description, picture, time_created, time_updated, online_payment 
       from "Post" where post_id=$1`
     let params = [post_id]
 
@@ -175,7 +175,7 @@ postModule.addPostCateDetails = ({post_id, category_id, details}) => {
   })
 }
 
-postModule.update = ({post_id, picture, post_state, priority_level}) => {
+postModule.update = ({post_id, picture, post_state}) => {
   return new Promise((resolve, reject) => {
     let num = 1
     let query = `update "Post" set `
@@ -189,11 +189,6 @@ postModule.update = ({post_id, picture, post_state, priority_level}) => {
       query += ` post_state=$${num++},`
       params.push(post_state)
     }
-    if (priority_level) {
-      query += ` priority_level=$${num++},`
-      params.push(priority_level)
-    }
-
     if (query.endsWith(' ')) {
       query = `select * from "Post" where post_id=$${num}`
       params.push(post_id)

@@ -6,7 +6,7 @@ const max_int = 2e9
 const role = {
   deliver: 'deliver',
   customer: 'customer',
-  admin: 'admin'
+  admin: 'director'
 }
 const postState = {
   PENDING: 'pending',

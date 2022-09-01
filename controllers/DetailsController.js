@@ -108,4 +108,16 @@ controller.updateDetails = async (req, res, next) => {
   }
 }
 
+controller.deleteDetails = async (req, res, next) => {
+  let {details_id} = req.params
+  try {
+    res.success({
+      message: messages.common.delete_success,
+      data: await detailsModule.delete({details_id})
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
 module.exports = controller

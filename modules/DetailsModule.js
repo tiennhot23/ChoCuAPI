@@ -96,4 +96,15 @@ detailsModule.update = ({
   })
 }
 
+detailsModule.delete = ({details_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `delete from "Details" where details_id=$1 returning *`
+    let params = [details_id]
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows[0])
+    })
+  })
+}
+
 module.exports = detailsModule

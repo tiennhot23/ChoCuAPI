@@ -21,6 +21,22 @@ const errorHandling = (err, req, res, next) => {
           data: []
         })
       }
+      case 'cate_fk': {
+        return res.json({
+          status: 'error',
+          code: 500,
+          message: messages.constraint.cate_fk,
+          data: []
+        })
+      }
+      case 'details_fk': {
+        return res.json({
+          status: 'error',
+          code: 500,
+          message: messages.constraint.details_fk,
+          data: []
+        })
+      }
       default: {
         return res.status(500).json({
           status: 'error',

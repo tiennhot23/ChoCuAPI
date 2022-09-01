@@ -30,7 +30,7 @@ cateModule.get = ({category_id}) => {
 
 cateModule.get_details = ({category_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select d.*, required from (select details_id, required from "CateDetails" where category_id=$1) cd
+    let query = `select d.* from (select details_id from "CateDetails" where category_id=$1) cd
     left join "Details" d on cd.details_id = d.details_id`
     let params = [category_id]
 
@@ -84,13 +84,22 @@ cateModule.update = ({category_id, category_title, category_icon}) => {
   })
 }
 
-cateModule.add_details = ({category_id, details_id, required}) => {
+cateModule.delete = ({category_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `insert into "CateDetails" (category_id, details_id ${
-      required ? `, required` : ``
-    }) values ($1,$2 ${required ? `, $3` : ``}) returning *`
+    let query = `delete from "Category" where category_id=$1 returning *`
+    let params = [category_id]
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows[0])
+    })
+  })
+}
+
+cateModule.add_details = ({category_id, details_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `insert into "CateDetails" (category_id, details_id) 
+    values ($1,$2) returning *`
     let params = [category_id, details_id]
-    if (required) params.push(required)
 
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)
@@ -103,12 +112,10 @@ cateModule.add_multi_details = ({category_id, details}) => {
   return new Promise((resolve, reject) => {
     if (details.length === 0) resolve([])
 
-    let query = `insert into "CateDetails" (category_id, details_id, required) values `
+    let query = `insert into "CateDetails" (category_id, details_id) values `
 
     details.map((e) => {
-      query += `(${category_id}, ${e.details_id}, ${
-        e.required ? e.required : false
-      }), `
+      query += `(${category_id}, ${e.details_id}), `
     })
     query = utils.removeCharAt(query, query.length - 2)
     query += ' returning *'
@@ -123,9 +130,27 @@ cateModule.add_multi_details = ({category_id, details}) => {
   })
 }
 
+cateModule.remove_multi_details = ({category_id, details}) => {
+  return new Promise((resolve, reject) => {
+    if (details.length === 0) resolve([])
+
+    let query = `delete from "CateDetails" where category_id=$1 and details_id = any (ARRAY [ ${details.map(
+      (e) => `${e.details_id}`
+    )} ]) returning *`
+    if (details.length === 0) return resolve([])
+    console.log(query)
+    let params = [category_id]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows)
+    })
+  })
+}
+
 cateModule.check_required_details = ({category_id, details}) => {
   return new Promise((resolve, reject) => {
-    let query = `select details_id from "CateDetails" where category_id=$1 and required=true`
+    let query = `select details_id from "CateDetails" where category_id=$1`
     let params = [category_id]
 
     conn.query(query, params, (err, res) => {

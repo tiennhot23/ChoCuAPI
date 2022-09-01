@@ -29,8 +29,8 @@ auth.verifyUser = (req, res, next) => {
           throw new InvalidToken()
         if ((await UserModule.getUserInfo({user_id})).role_id !== role.customer)
           throw new Forbidden()
-        if (!(await accountModule.findAccountByAccountID({account_id})).active)
-          throw new Forbidden(messages.user.account_locked)
+        // if (!(await accountModule.findAccountByAccountID({account_id})).active)
+        //   throw new Forbidden(messages.user.account_locked)
 
         req.user = {user_id, account_id, access_token}
         next()

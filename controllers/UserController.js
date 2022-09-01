@@ -71,16 +71,14 @@ userController.getUserPayments = async (req, res, next) => {
 }
 
 userController.createAccount = async (req, res, next) => {
-  let {phone, password, verify_code} = req.body
+  let {phone, password} = req.body
   try {
     if (!phone) throw new BadRequest(messages.user.phone_required)
     if (!helper.isValidatePhone(phone))
       throw new BadRequest(messages.user.phone_invalid)
 
-    if (verify_code) await otpModule.deleteOTP(phone)
     let {account_id} = await userModule.createAccount({phone, password})
     if (account_id) {
-      await otpModule.deleteOTP(phone)
       res.success({
         message: messages.user.create_account_success,
         data: await userModule.createUser({account_id, phone})
@@ -104,7 +102,7 @@ userController.login = async (req, res, next) => {
     if (!account) res.success({message: messages.user.incorrect_account})
     let {account_id, role_id} = account
     if (role_id !== role.customer) throw new Forbidden()
-    if (!account.active) throw new Forbidden(messages.user.account_locked)
+    // if (!account.active) throw new Forbidden(messages.user.account_locked)
     let {user_id} = await userModule.findUserByAccount({account_id})
     let access_token = utils.generateAccessToken({user_id, account_id})
     if (
@@ -138,10 +136,9 @@ userController.logout = async (req, res, next) => {
 }
 
 userController.resetPassword = async (req, res, next) => {
-  let {password, phone, verify_code} = req.body
+  let {password, phone} = req.body
   let {account_id} = req.user || {}
   try {
-    if (verify_code) await otpModule.deleteOTP(phone)
     if (!account_id) {
       let u = await userModule.findAccountByUsername({username: phone})
       account_id = u?.account_id
@@ -219,9 +216,9 @@ userController.removeUserPayment = async (req, res, next) => {
 
 userController.addUserServices = async (req, res, next) => {
   let {user_id} = req.user
-  let {service_id, price, post_turn} = req.body
+  let {price, post_turn} = req.body
   try {
-    if (await servicesModule.addUserServices({user_id, service_id, price})) {
+    if (await servicesModule.addUserServices({user_id, price})) {
       await userModule.increasePostTurn({user_id, extra_post_turn: post_turn})
       res.success({
         message: messages.user.add_success,

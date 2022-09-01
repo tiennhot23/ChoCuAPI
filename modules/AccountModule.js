@@ -8,7 +8,7 @@ const accountModule = {}
 
 accountModule.findAccountByUsername = ({username}) => {
   return new Promise((resolve, reject) => {
-    let query = `select * from "Account" where username=$1 and active=true`
+    let query = `select * from "Account" where username=$1`
 
     let params = [username]
 
@@ -21,7 +21,7 @@ accountModule.findAccountByUsername = ({username}) => {
 
 accountModule.findAccountByAccountID = ({account_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select * from "Account" where account_id=$1 and active=true`
+    let query = `select * from "Account" where account_id=$1`
 
     let params = [account_id]
 
@@ -34,7 +34,20 @@ accountModule.findAccountByAccountID = ({account_id}) => {
 
 accountModule.lockAccount = ({account_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `update "Account" set active=false, access_tokens='{}', fcm_tokens='{}' where account_id=$1 returning *`
+    let query = `update "Account" set active=false where account_id=$1 returning *`
+
+    let params = [account_id]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows[0])
+    })
+  })
+}
+
+accountModule.unlockAccount = ({account_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `update "Account" set active=true where account_id=$1 returning *`
 
     let params = [account_id]
 

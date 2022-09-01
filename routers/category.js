@@ -19,11 +19,14 @@ category.get(
 category.post('/', upload.any('category_icon'), categoryController.addCategory)
 
 category.post(
-  '/:category_id',
+  '/update/:category_id',
   upload.any('category_icon'),
   categoryController.updateCategory
 )
 
+category.post('/delete/:category_id', categoryController.deleteCategory)
+
 category.post('/add-details/:category_id', categoryController.addDetails)
+category.post('/remove-details/:category_id', categoryController.removeDetails)
 
 module.exports = category

@@ -33,7 +33,7 @@ controller.getCategoryDetails = async (req, res, next) => {
 }
 
 controller.addCategory = async (req, res, next) => {
-  let {category_title, category_icon} = req.body
+  let {category_title, category_icon = ''} = req.body
   let isUploadFile =
     req.files &&
     req.files.length > 0 &&
@@ -110,6 +110,18 @@ controller.updateCategory = async (req, res, next) => {
   }
 }
 
+controller.deleteCategory = async (req, res, next) => {
+  let {category_id} = req.params
+  try {
+    res.success({
+      message: messages.common.delete_success,
+      data: await cateModule.delete({category_id})
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
 controller.addDetails = async (req, res, next) => {
   let {category_id} = req.params
   let {details} = req.body
@@ -124,19 +136,22 @@ controller.addDetails = async (req, res, next) => {
   } catch (e) {
     next(e)
   }
-  // let {details_id, required} = req.body
-  // try {
-  //   if (!helper.isValidObject(details_id))
-  //     throw new BadRequest(messages.category.details_id_required)
+}
 
-  //   if (await cateModule.add_details({category_id, details_id, required}))
-  //     res.success({
-  //       message: messages.common.add_success,
-  //       data: [{added: true}]
-  //     })
-  // } catch (e) {
-  //   next(e)
-  // }
+controller.removeDetails = async (req, res, next) => {
+  let {category_id} = req.params
+  let {details} = req.body
+  try {
+    if (!helper.isArray(details))
+      throw new BadRequest(messages.category.details_id_required)
+
+    res.success({
+      message: messages.common.delete_success,
+      data: await cateModule.remove_multi_details({category_id, details})
+    })
+  } catch (e) {
+    next(e)
+  }
 }
 
 module.exports = controller

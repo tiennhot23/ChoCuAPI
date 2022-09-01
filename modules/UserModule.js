@@ -82,8 +82,8 @@ userModule.getUserFollower = ({user_id}) => {
 
 userModule.getUserPosts = ({user_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select post_id, title, default_price, sell_address, picture, time_created, time_updated, post_state 
-    from "Post" where seller_id=$1 and (post_state='active' or post_state='expired') order by time_updated`
+    let query = `select post_id, title, default_price, sell_address, picture, time_created,  time_updated, post_state 
+    from "Post" where seller_id=$1 and (post_state='active' or post_state='expired') order by time_created`
 
     let params = [user_id]
 
@@ -123,7 +123,7 @@ userModule.getUserPostTurn = ({user_id}) => {
 
 userModule.findUserByAccount = ({account_id}) => {
   return new Promise((resolve, reject) => {
-    let query = `select u.user_id, name, phone, email, address, rating, a.role_id, a.active, post_turn, a.active, a.fcm_tokens 
+    let query = `select u.user_id, name, phone, email, address, rating, a.role_id, a.active, post_turn, a.fcm_tokens 
     from "Customer" u, "Account" a where u.account_id=a.account_id and a.account_id=$1`
 
     let params = [account_id]
@@ -137,7 +137,7 @@ userModule.findUserByAccount = ({account_id}) => {
 
 userModule.findAccountByUsername = ({username}) => {
   return new Promise((resolve, reject) => {
-    let query = `select * from "Account" where username=$1 and active=true`
+    let query = `select * from "Account" where username=$1`
 
     let params = [username]
 
@@ -155,7 +155,7 @@ userModule.findAccountByUsername = ({username}) => {
  */
 userModule.isValidAccessToken = ({account_id, access_token}) => {
   return new Promise((resolve, reject) => {
-    let query = `select 1 as exist from "Account" where account_id=$1 and active=true and  $2 = ANY (access_tokens::varchar[])`
+    let query = `select 1 as exist from "Account" where account_id=$1 and  $2 = ANY (access_tokens::varchar[])`
 
     let params = [account_id, access_token]
 
@@ -194,7 +194,7 @@ userModule.createUser = ({account_id, phone}) => {
 
 userModule.login = ({username, password}) => {
   return new Promise((resolve, reject) => {
-    let query = `select * from "Account" a where a.username=$1 and a.active=true`
+    let query = `select * from "Account" a where a.username=$1`
     let params = [username]
 
     conn.query(query, params, (err, res) => {
@@ -319,7 +319,7 @@ userModule.updateInfo = ({user_id, name, avatar, email, address}) => {
 
 userModule.updatePassword = ({account_id, password}) => {
   return new Promise((resolve, reject) => {
-    let query = `update "Account" set password=$2 where account_id=$1 and active=true`
+    let query = `update "Account" set password=$2 where account_id=$1`
     let params = [account_id, password]
 
     conn.query(query, params, (err, res) => {

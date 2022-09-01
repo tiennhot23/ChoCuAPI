@@ -45,6 +45,8 @@ controller.getPost = async (req, res, next) => {
   try {
     let post = await postModule.getPost({post_id})
     if (!post) throw new NotFound(messages.post.not_found)
+    // if (post.post_state === 'deleted')
+    //   throw new NotFound(messages.post.not_found)
     let user = await userModule.getUserInfo({user_id: post.seller_id})
     let category = await postModule.getPostCate({post_id})
     let details = await postModule.getPostCateDetails({post_id})
@@ -92,6 +94,7 @@ controller.getAllRating = async (req, res, next) => {
 }
 
 controller.createPost = async (req, res, next) => {
+  console.log(req.body)
   let {
     title,
     default_price,
@@ -125,14 +128,6 @@ controller.createPost = async (req, res, next) => {
     if (post_turn <= 0) {
       res.success({message: messages.user.post_turn_out})
     }
-
-    if (
-      !(await categoryModule.check_required_details({
-        category_id,
-        details
-      }))
-    )
-      throw new BadRequest(messages.post.missing_required_details)
 
     let post = await postModule.add({
       seller_id: user_id,
@@ -215,9 +210,20 @@ controller.repostPost = async (req, res, next) => {
     if (post.post_state === postState.PENDING)
       throw new GeneralError(messages.post.post_pending)
     if (user_id !== post.seller_id) throw new Forbidden()
+
+    let {post_turn} = await userModule.getUserPostTurn({user_id})
+    if (post_turn <= 0) {
+      res.success({message: messages.user.post_turn_out})
+    }
+
+    let data = await postModule.update({post_id, post_state: postState.ACTIVE})
+    if (data) {
+      await userModule.decreasePostTurn({user_id})
+    }
+
     res.success({
       message: messages.post.post_actived,
-      data: await postModule.update({post_id, post_state: postState.ACTIVE})
+      data: data
     })
   } catch (e) {
     next(e)

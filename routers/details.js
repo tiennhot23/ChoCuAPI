@@ -14,9 +14,11 @@ details.get('/', detailsController.getDetails)
 details.post('/', upload.any('details_icon'), detailsController.addDetails)
 
 details.post(
-  '/:details_id',
+  '/update/:details_id',
   upload.any('details_icon'),
   detailsController.updateDetails
 )
+
+details.post('/delete/:details_id', detailsController.deleteDetails)
 
 module.exports = details

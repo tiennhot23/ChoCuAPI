@@ -23,7 +23,7 @@ user.get('/user-payments/:user_id', userController.getUserPayments)
 
 user.post(
   '/create-account',
-  otpController.verifyAction,
+  // otpController.verifyAction,
   encrypt.hashPassword,
   userController.createAccount
 )
@@ -34,7 +34,7 @@ user.post('/logout', auth.verifyUser, userController.logout)
 
 user.post(
   '/forgot-password',
-  otpController.verifyAction,
+  // otpController.verifyAction,
   encrypt.hashPassword,
   userController.resetPassword
 )

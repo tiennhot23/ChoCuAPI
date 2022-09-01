@@ -116,16 +116,21 @@ dealController.updateDealState = async (req, res, next) => {
 
           let buyer = await userModule.getUserInfo({user_id: deal.buyer_id})
           let seller = await userModule.getUserInfo({user_id: deal.seller_id})
-          await notifyModule.send({
-            notify_detail_id: deal_id,
-            notify_type: 'deal',
-            title: 'Giao dịch thất bại',
-            message: `Giao dịch mặt hàng "${deal.title}" đã bị huỷ bởi ${
-              user_id === deal.seller_id ? 'người bán' : 'người mua'
-            }`,
-            user_fcm_token:
-              user_id === deal.seller_id ? buyer.fcm_tokens : seller.fcm_tokens
-          })
+          let user_fcm_token =
+            user_id === deal.seller_id ? buyer.fcm_tokens : seller.fcm_tokens
+          if (user_fcm_token && user_fcm_token.length > 0)
+            await notifyModule.send({
+              notify_detail_id: deal_id,
+              notify_type: 'deal',
+              title: 'Giao dịch thất bại',
+              message: `Giao dịch mặt hàng "${deal.title}" đã bị huỷ bởi ${
+                user_id === deal.seller_id ? 'người bán' : 'người mua'
+              }`,
+              user_fcm_token:
+                user_id === deal.seller_id
+                  ? buyer.fcm_tokens
+                  : seller.fcm_tokens
+            })
           return
         } else {
           throw new GeneralError(messages.deal.deal_not_pending)
@@ -142,13 +147,15 @@ dealController.updateDealState = async (req, res, next) => {
 
           let buyer = await userModule.getUserInfo({user_id: deal.buyer_id})
           let seller = await userModule.getUserInfo({user_id: deal.seller_id})
-          await notifyModule.send({
-            notify_detail_id: deal_id,
-            notify_type: 'deal',
-            title: 'Giao dịch đã được xác nhận',
-            message: `Giao dịch mặt hàng "${deal.title}" đã được xác nhận bởi người bán`,
-            user_fcm_token: buyer.fcm_tokens
-          })
+          let user_fcm_token = buyer.fcm_tokens
+          if (user_fcm_token && user_fcm_token.length > 0)
+            await notifyModule.send({
+              notify_detail_id: deal_id,
+              notify_type: 'deal',
+              title: 'Giao dịch đã được xác nhận',
+              message: `Giao dịch mặt hàng "${deal.title}" đã được xác nhận bởi người bán`,
+              user_fcm_token: buyer.fcm_tokens
+            })
           return
         } else {
           throw new GeneralError(messages.deal.deal_not_pending)
@@ -165,13 +172,15 @@ dealController.updateDealState = async (req, res, next) => {
 
           let buyer = await userModule.getUserInfo({user_id: deal.buyer_id})
           let seller = await userModule.getUserInfo({user_id: deal.seller_id})
-          await notifyModule.send({
-            notify_detail_id: deal_id,
-            notify_type: 'deal',
-            title: 'Giao dịch đã được thanh toán',
-            message: `Giao dịch mặt hàng "${deal.title}" đã được thanh toán bởi người mua`,
-            user_fcm_token: seller.fcm_tokens
-          })
+          let user_fcm_token = seller.fcm_tokens
+          if (user_fcm_token && user_fcm_token.length > 0)
+            await notifyModule.send({
+              notify_detail_id: deal_id,
+              notify_type: 'deal',
+              title: 'Giao dịch đã được thanh toán',
+              message: `Giao dịch mặt hàng "${deal.title}" đã được thanh toán bởi người mua`,
+              user_fcm_token: seller.fcm_tokens
+            })
           return
         } else {
           throw new GeneralError(messages.deal.deal_not_confirmed)
@@ -188,13 +197,15 @@ dealController.updateDealState = async (req, res, next) => {
             })
 
             let buyer = await userModule.getUserInfo({user_id: deal.buyer_id})
-            await notifyModule.send({
-              notify_detail_id: deal_id,
-              notify_type: 'deal',
-              title: 'Đang giao hàng',
-              message: `Mặt hàng "${deal.title}" đang được giao đến người mua`,
-              user_fcm_token: buyer.fcm_tokens
-            })
+            let user_fcm_token = buyer.fcm_tokens
+            if (user_fcm_token && user_fcm_token.length > 0)
+              await notifyModule.send({
+                notify_detail_id: deal_id,
+                notify_type: 'deal',
+                title: 'Đang giao hàng',
+                message: `Mặt hàng "${deal.title}" đang được giao đến người mua`,
+                user_fcm_token: buyer.fcm_tokens
+              })
             return
           } else {
             throw new GeneralError(messages.deal.deal_not_paid)
@@ -209,13 +220,15 @@ dealController.updateDealState = async (req, res, next) => {
             })
 
             let buyer = await userModule.getUserInfo({user_id: deal.buyer_id})
-            await notifyModule.send({
-              notify_detail_id: deal_id,
-              notify_type: 'deal',
-              title: 'Đang giao hàng',
-              message: `Mặt hàng "${deal.title}" đang được giao đến người mua`,
-              user_fcm_token: buyer.fcm_tokens
-            })
+            let user_fcm_token = buyer.fcm_tokens
+            if (user_fcm_token && user_fcm_token.length > 0)
+              await notifyModule.send({
+                notify_detail_id: deal_id,
+                notify_type: 'deal',
+                title: 'Đang giao hàng',
+                message: `Mặt hàng "${deal.title}" đang được giao đến người mua`,
+                user_fcm_token: buyer.fcm_tokens
+              })
             return
           } else {
             throw new GeneralError(messages.deal.deal_not_confirmed)
@@ -232,13 +245,15 @@ dealController.updateDealState = async (req, res, next) => {
           })
 
           let seller = await userModule.getUserInfo({user_id: deal.seller_id})
-          await notifyModule.send({
-            notify_detail_id: deal_id,
-            notify_type: 'deal',
-            title: 'Giao dịch thành công',
-            message: `Mặt hàng "${deal.title}" đã được giao thành công tới người mua`,
-            user_fcm_token: seller.fcm_tokens
-          })
+          let user_fcm_token = seller.fcm_tokens
+          if (user_fcm_token && user_fcm_token.length > 0)
+            await notifyModule.send({
+              notify_detail_id: deal_id,
+              notify_type: 'deal',
+              title: 'Giao dịch thành công',
+              message: `Mặt hàng "${deal.title}" đã được giao thành công tới người mua`,
+              user_fcm_token: seller.fcm_tokens
+            })
           return
         } else {
           throw new GeneralError(messages.deal.deal_not_send)
@@ -254,13 +269,15 @@ dealController.updateDealState = async (req, res, next) => {
           })
 
           let seller = await userModule.getUserInfo({user_id: deal.seller_id})
-          await notifyModule.send({
-            notify_detail_id: deal_id,
-            notify_type: 'deal',
-            title: 'Người mua đánh giá giao dịch',
-            message: `Giao dịch mặt hàng "${deal.title}" đã được đánh giá bởi người mua`,
-            user_fcm_token: seller.fcm_tokens
-          })
+          let user_fcm_token = seller.fcm_tokens
+          if (user_fcm_token && user_fcm_token.length > 0)
+            await notifyModule.send({
+              notify_detail_id: deal_id,
+              notify_type: 'deal',
+              title: 'Người mua đánh giá giao dịch',
+              message: `Giao dịch mặt hàng "${deal.title}" đã được đánh giá bởi người mua`,
+              user_fcm_token: seller.fcm_tokens
+            })
           return
         } else {
           throw new GeneralError(messages.deal.deal_not_received)
@@ -304,6 +321,15 @@ dealController.rateDeal = async (req, res, next) => {
         user_id: seller.user_id,
         rating: seller.rating
       })
+      let user_fcm_token = seller.fcm_tokens
+      if (user_fcm_token && user_fcm_token.length > 0)
+        await notifyModule.send({
+          notify_detail_id: deal_id,
+          notify_type: 'deal',
+          title: 'Người mua đánh giá giao dịch',
+          message: `Giao dịch mặt hàng "${deal.title}" đã được đánh giá bởi người mua`,
+          user_fcm_token: seller.fcm_tokens
+        })
     }
 
     res.success({
