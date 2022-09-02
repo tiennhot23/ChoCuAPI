@@ -17,7 +17,11 @@ postModule.get = ({key_search, location, category}) => {
     let query = `select post_id, title, default_price, sell_address, picture, time_created, time_updated, online_payment 
       from "Post" p where post_state = 'active' ${
         category?.category_id
-          ? ` and post_id in
+          ? ` and category_id=${category?.category_id} `
+          : ``
+      } ${
+      arr_details && arr_details.length > 0
+        ? ` and post_id in
                   (select post_id from "PostCateDetails"
                       where category_id = $${num++}
                       ${
@@ -30,13 +34,13 @@ postModule.get = ({key_search, location, category}) => {
                             )} ])`
                           : ``
                       }) `
-          : ``
-      } ${location ? ` and sell_address ilike $${num++} ` : ``} ${
+        : ``
+    } ${location ? ` and sell_address ilike $${num++} ` : ``} ${
       key_search ? ` and keyword @@ to_tsquery($${num++}) ` : ``
     } order by time_created desc`
 
     let params = []
-    if (category?.category_id) params.push(category.category_id)
+    if (arr_details && arr_details.length > 0) params.push(category.category_id)
     // if (arr_details && arr_details.length > 0) params.push(arr_details)
     if (location) params.push('%' + location)
     if (key_search) params.push(utils.toTSQueryPostgreSyntax(key_search))
@@ -64,7 +68,7 @@ postModule.getUserPosts = ({user_id}) => {
 postModule.getPost = ({post_id}) => {
   return new Promise((resolve, reject) => {
     let query = `select post_id, seller_id, title, default_price, sell_address, post_state, 
-      description, picture, time_created, time_updated, online_payment 
+      description, picture, time_created, time_updated, online_payment, category_id  
       from "Post" where post_id=$1`
     let params = [post_id]
 
@@ -89,13 +93,11 @@ postModule.getAllRating = ({post_id}) => {
   })
 }
 
-postModule.getPostCate = ({post_id}) => {
+postModule.getPostCate = ({category_id}) => {
   return new Promise((resolve, reject) => {
     let query = `select * from "Category" 
-      where category_id=(select category_id 
-                          from "PostCateDetails" where post_id=$1 limit 1) 
-      limit 1`
-    let params = [post_id]
+      where category_id=$1 limit 1`
+    let params = [category_id]
 
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)
@@ -125,15 +127,19 @@ postModule.add = ({
   sell_address,
   description,
   picture,
+  category_id,
   online_payment
 }) => {
   return new Promise((resolve, reject) => {
+    let num = 8
     let post_id = uuidv4()
-    let query = `insert into "Post" (post_id, seller_id, title, default_price, sell_address, picture 
+    let query = `insert into "Post" (post_id, seller_id, title, default_price, sell_address, picture, category_id 
     ${description ? `, description` : ``} ${
       online_payment ? `, online_payment` : ``
-    }) values ($1, $2, $3, $4, $5, $6 
-    ${description ? `, $7` : ``} ${online_payment ? `, $8` : ``}) returning *`
+    }) values ($1, $2, $3, $4, $5, $6, $7 
+    ${description ? `, $${num++}` : ``} ${
+      online_payment ? `, $${num++}` : ``
+    }) returning *`
 
     let params = [
       post_id,
@@ -141,7 +147,8 @@ postModule.add = ({
       title,
       default_price,
       sell_address,
-      picture
+      picture,
+      category_id
     ]
     if (description) params.push(description)
     if (online_payment) params.push(online_payment)
@@ -175,15 +182,60 @@ postModule.addPostCateDetails = ({post_id, category_id, details}) => {
   })
 }
 
-postModule.update = ({post_id, picture, post_state}) => {
+postModule.removePostCateDetails = ({post_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `delete from "PostCateDetails" where post_id=$1 returning *`
+    let params = [post_id]
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else resolve(res.rows)
+    })
+  })
+}
+
+postModule.update = ({
+  post_id,
+  title,
+  default_price,
+  sell_address,
+  description,
+  online_payment,
+  category_id,
+  picture,
+  post_state
+}) => {
   return new Promise((resolve, reject) => {
     let num = 1
     let query = `update "Post" set `
     let params = []
 
+    if (title) {
+      query += ` title=$${num++},`
+      params.push(title)
+    }
+    if (default_price) {
+      query += ` default_price=$${num++},`
+      params.push(default_price)
+    }
+    if (sell_address) {
+      query += ` sell_address=$${num++},`
+      params.push(sell_address)
+    }
+    if (description) {
+      query += ` description=$${num++},`
+      params.push(description)
+    }
+    if (online_payment) {
+      query += ` online_payment=$${num++},`
+      params.push(online_payment)
+    }
     if (picture) {
       query += ` picture=$${num++},`
       params.push(picture)
+    }
+    if (category_id) {
+      query += ` category_id=$${num++},`
+      params.push(category_id)
     }
     if (post_state) {
       query += ` post_state=$${num++},`
@@ -197,6 +249,9 @@ postModule.update = ({post_id, picture, post_state}) => {
       query += ` where post_id=$${num} returning *`
       params.push(post_id)
     }
+
+    console.log(query)
+    console.log(params)
 
     conn.query(query, params, (err, res) => {
       if (err) return reject(err)

@@ -43,11 +43,7 @@ admin.post(
 
 admin.post('/deny-post/:post_id', auth.verifyAdmin, adminController.denyPost)
 
-admin.post(
-  '/delete-post/:post_id',
-  auth.verifyAdmin,
-  adminController.deletePost
-)
+admin.post('/lock-post/:post_id', auth.verifyAdmin, adminController.lockPost)
 
 admin.get('/reports', adminController.getReports)
 admin.post('/clear-report/:post_id', adminController.clearPostReports)

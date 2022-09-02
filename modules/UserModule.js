@@ -83,7 +83,7 @@ userModule.getUserFollower = ({user_id}) => {
 userModule.getUserPosts = ({user_id}) => {
   return new Promise((resolve, reject) => {
     let query = `select post_id, title, default_price, sell_address, picture, time_created,  time_updated, post_state 
-    from "Post" where seller_id=$1 and (post_state='active' or post_state='expired') order by time_created`
+    from "Post" where seller_id=$1 and (post_state='active' or post_state='sold') order by time_created`
 
     let params = [user_id]
 

@@ -48,7 +48,7 @@ controller.getPost = async (req, res, next) => {
     // if (post.post_state === 'deleted')
     //   throw new NotFound(messages.post.not_found)
     let user = await userModule.getUserInfo({user_id: post.seller_id})
-    let category = await postModule.getPostCate({post_id})
+    let category = await postModule.getPostCate({category_id: post.category_id})
     let details = await postModule.getPostCateDetails({post_id})
     res.success({
       data: {
@@ -136,6 +136,7 @@ controller.createPost = async (req, res, next) => {
       sell_address,
       description,
       picture,
+      category_id,
       online_payment
     })
 
@@ -179,20 +180,110 @@ controller.createPost = async (req, res, next) => {
   }
 }
 
+controller.editPost = async (req, res, next) => {
+  console.log(req.body)
+  let {
+    title,
+    default_price,
+    sell_address,
+    description,
+    default_picture = [],
+    online_payment,
+    category_id,
+    details = []
+  } = req.body
+  if (helper.isString(default_picture)) default_picture = [default_picture]
+  let {post_id} = req.params
+  let isUploadFile =
+    req.files && req.files.length > 0 && req.files[0].fieldname === 'picture'
+  let {user_id} = req.user
+  try {
+    let post = await postModule.getPost({post_id})
+    let isPostActive =
+      post.post_state !== postState.DENIED ||
+      post.post_state !== postState.PENDING
+    if (!post) throw new NotFound(messages.post.not_found)
+    if (post.post_state === postState.LOCKED)
+      throw new GeneralError(messages.post.post_deleted)
+    if (isUploadFile) {
+      if (!req.files[0]['mimetype'].includes('image'))
+        throw new BadRequest(messages.common.image_invalid)
+    }
+    if (!helper.isValidObject(title) && !isPostActive)
+      throw new BadRequest(messages.post.title_required)
+    if (!helper.isValidObject(default_price))
+      throw new BadRequest(messages.post.price_required)
+    if (!helper.isValidObject(sell_address))
+      throw new BadRequest(messages.post.address_required)
+    if (!helper.isValidObject(category_id) && !isPostActive)
+      throw new BadRequest(messages.post.category_required)
+    if (!helper.isArray(details))
+      throw new BadRequest(messages.post.details_required)
+
+    let {post_turn} = await userModule.getUserPostTurn({user_id})
+    if (post_turn <= 0) {
+      res.success({message: messages.user.post_turn_out})
+    }
+
+    post = await postModule.update({
+      post_id,
+      title: isPostActive ? null : title,
+      default_price,
+      sell_address,
+      description,
+      picture: default_picture,
+      online_payment,
+      category_id: isPostActive ? null : category_id,
+      post_state: postState.PENDING
+    })
+
+    if (post) {
+      if (isPostActive) await userModule.decreasePostTurn({user_id})
+      await postModule.removePostCateDetails({post_id: post.post_id})
+      await postModule.addPostCateDetails({
+        post_id: post.post_id,
+        category_id,
+        details
+      })
+      if (isUploadFile) {
+        let picture = await fileModule.upload_multi_with_index(
+          req.files,
+          `post/${post.post_id}/`
+        )
+        console.log([...default_picture, picture])
+        post = await postModule.update({
+          post_id: post.post_id,
+          picture: [...default_picture, ...picture]
+        })
+      }
+
+      res.success({
+        data: post
+      })
+
+      return
+    } else throw new GeneralError(messages.common.something_wrong)
+  } catch (e) {
+    next(e)
+  }
+}
+
 controller.endPost = async (req, res, next) => {
   let {post_id} = req.params
   let {user_id} = req.user
   try {
     let post = await postModule.getPost({post_id})
     if (!post) throw new NotFound(messages.post.not_found)
-    if (post.post_state === postState.DELETED)
-      throw new GeneralError(messages.post.post_deleted)
-    if (post.post_state === postState.PENDING)
-      throw new GeneralError(messages.post.post_pending)
+    // if (post.post_state === postState.LOCKED)
+    //   throw new GeneralError(messages.post.post_deleted)
+    // if (post.post_state === postState.PENDING)
+    //   throw new GeneralError(messages.post.post_pending)
+    if (post.post_state !== postState.ACTIVE)
+      throw new GeneralError(messages.post.post_not_active)
     if (user_id !== post.seller_id) throw new Forbidden()
     res.success({
       message: messages.post.post_expired,
-      data: await postModule.update({post_id, post_state: postState.EXPIRED})
+      data: await postModule.update({post_id, post_state: postState.HIDDEN})
     })
   } catch (e) {
     next(e)
@@ -205,10 +296,12 @@ controller.repostPost = async (req, res, next) => {
   try {
     let post = await postModule.getPost({post_id})
     if (!post) throw new NotFound(messages.post.not_found)
-    if (post.post_state === postState.DELETED)
-      throw new GeneralError(messages.post.post_deleted)
-    if (post.post_state === postState.PENDING)
-      throw new GeneralError(messages.post.post_pending)
+    // if (post.post_state === postState.LOCKED)
+    //   throw new GeneralError(messages.post.post_deleted)
+    // if (post.post_state === postState.PENDING)
+    //   throw new GeneralError(messages.post.post_pending)
+    if (post.post_state !== postState.HIDDEN)
+      throw new GeneralError(messages.post.post_not_hide)
     if (user_id !== post.seller_id) throw new Forbidden()
 
     let {post_turn} = await userModule.getUserPostTurn({user_id})

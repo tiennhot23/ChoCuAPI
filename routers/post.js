@@ -24,6 +24,13 @@ post.post(
   postController.createPost
 )
 
+post.post(
+  '/edit-post/:post_id',
+  auth.verifyUser,
+  upload.array('picture', 5),
+  postController.editPost
+)
+
 post.post('/end-post/:post_id', auth.verifyUser, postController.endPost)
 
 post.post('/repost-post/:post_id', auth.verifyUser, postController.repostPost)

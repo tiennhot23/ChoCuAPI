@@ -10,18 +10,20 @@ const role = {
 }
 const postState = {
   PENDING: 'pending',
+  DENIED: 'denied',
   ACTIVE: 'active',
-  DELETED: 'deleted',
-  EXPIRED: 'expired'
+  LOCKED: 'locked',
+  HIDDEN: 'hidden',
+  SOLD: 'sold'
 }
 const dealState = {
   PENDING: 'pending',
   PAID: 'paid',
   CONFIRMED: 'confirmed',
-  SENDING: 'sending',
-  RECEIVED: 'received',
+  DELIVERING: 'delivering',
+  DELIVERED: 'delivered',
   CANCELED: 'canceled',
-  UNRATED: 'unrated',
+  DENIED: 'denied',
   DONE: 'done'
 }
 const notifyType = {

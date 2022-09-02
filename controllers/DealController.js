@@ -68,12 +68,13 @@ dealController.getDeal = async (req, res, next) => {
 dealController.createDeal = async (req, res, next) => {
   let {post_id} = req.params
   let {user_id} = req.user
-  let {receive_address, deal_price, online_deal = false} = req.body
+  let {receive_address, online_deal = false} = req.body
   try {
     let post = await postModule.getPost({post_id})
     if (!post) throw new NotFound(messages.post.not_found)
     if (!receive_address) throw new BadRequest(messages.deal.address_required)
-    if (!deal_price) throw new BadRequest(messages.deal.price_required)
+    if (post.post_state === postState.SOLD)
+      throw new GeneralError('Mặt hàng này vừa được bán cho người khác')
     if (post.seller_id === user_id) {
       res.success({
         message: messages.deal.can_not_deal_self,
@@ -86,7 +87,6 @@ dealController.createDeal = async (req, res, next) => {
           buyer_id: user_id,
           post_id,
           receive_address,
-          deal_price,
           online_deal
         })
       })
@@ -109,9 +109,10 @@ dealController.updateDealState = async (req, res, next) => {
         if (deal.deal_state === dealState.PENDING) {
           if (user_id !== deal.seller_id && user_id != deal.buyer_id)
             throw new Forbidden(messages.auth.forbidden)
-          res.success({
-            message: messages.deal.deal_canceled,
-            data: await dealModule.update({deal_id, deal_state})
+          let data = await dealModule.update({deal_id, deal_state})
+          await postModule.update({
+            post_id: deal.post_id,
+            post_state: postState.ACTIVE
           })
 
           let buyer = await userModule.getUserInfo({user_id: deal.buyer_id})
@@ -131,18 +132,51 @@ dealController.updateDealState = async (req, res, next) => {
                   ? buyer.fcm_tokens
                   : seller.fcm_tokens
             })
+          res.success({
+            message: messages.deal.deal_canceled,
+            data: data
+          })
+
+          return
+        } else if (deal.deal_state === dealState.DELIVERING) {
+          if (user_id !== deal.seller_id)
+            throw new Forbidden(messages.auth.forbidden)
+          let data = await dealModule.update({deal_id, deal_state})
+          let buyer = await userModule.getUserInfo({user_id: deal.buyer_id})
+          let seller = await userModule.getUserInfo({user_id: deal.seller_id})
+          let user_fcm_token =
+            user_id === deal.seller_id ? buyer.fcm_tokens : seller.fcm_tokens
+          if (user_fcm_token && user_fcm_token.length > 0)
+            await notifyModule.send({
+              notify_detail_id: deal_id,
+              notify_type: 'deal',
+              title: 'Giao dịch thất bại',
+              message: `Giao dịch mặt hàng "${deal.title}" đã bị huỷ bởi ${
+                user_id === deal.seller_id ? 'người bán' : 'người mua'
+              }`,
+              user_fcm_token:
+                user_id === deal.seller_id
+                  ? buyer.fcm_tokens
+                  : seller.fcm_tokens
+            })
+          res.success({
+            message: messages.deal.deal_canceled,
+            data: data
+          })
+
           return
         } else {
-          throw new GeneralError(messages.deal.deal_not_pending)
+          throw new GeneralError('Không thể huỷ giao dịch lúc này')
         }
       }
       case dealState.CONFIRMED: {
         if (deal.deal_state === dealState.PENDING) {
           if (user_id !== deal.seller_id)
             throw new Forbidden(messages.auth.forbidden)
-          res.success({
-            message: messages.deal.deal_confirmed,
-            data: await dealModule.update({deal_id, deal_state})
+          let data = await dealModule.update({deal_id, deal_state})
+          await postModule.update({
+            post_id: deal.post_id,
+            post_state: postState.SOLD
           })
 
           let buyer = await userModule.getUserInfo({user_id: deal.buyer_id})
@@ -156,94 +190,46 @@ dealController.updateDealState = async (req, res, next) => {
               message: `Giao dịch mặt hàng "${deal.title}" đã được xác nhận bởi người bán`,
               user_fcm_token: buyer.fcm_tokens
             })
+          res.success({
+            message: messages.deal.deal_confirmed,
+            data: data
+          })
+
           return
         } else {
           throw new GeneralError(messages.deal.deal_not_pending)
         }
       }
-      case dealState.PAID: {
+      case dealState.DELIVERING: {
         if (deal.deal_state === dealState.CONFIRMED) {
-          if (user_id !== deal.buyer_id)
+          if (user_id !== deal.seller_id)
             throw new Forbidden(messages.auth.forbidden)
-          res.success({
-            message: messages.deal.deal_paid,
-            data: await dealModule.update({deal_id, deal_state})
-          })
-
+          let data = await dealModule.update({deal_id, deal_state})
           let buyer = await userModule.getUserInfo({user_id: deal.buyer_id})
-          let seller = await userModule.getUserInfo({user_id: deal.seller_id})
-          let user_fcm_token = seller.fcm_tokens
+          let user_fcm_token = buyer.fcm_tokens
           if (user_fcm_token && user_fcm_token.length > 0)
             await notifyModule.send({
               notify_detail_id: deal_id,
               notify_type: 'deal',
-              title: 'Giao dịch đã được thanh toán',
-              message: `Giao dịch mặt hàng "${deal.title}" đã được thanh toán bởi người mua`,
-              user_fcm_token: seller.fcm_tokens
+              title: 'Đang giao hàng',
+              message: `Mặt hàng "${deal.title}" đang được giao đến người mua`,
+              user_fcm_token: buyer.fcm_tokens
             })
+          res.success({
+            message: messages.deal.deal_delivering,
+            data: data
+          })
+
           return
         } else {
           throw new GeneralError(messages.deal.deal_not_confirmed)
         }
       }
-      case dealState.SENDING: {
-        if (deal.online_deal) {
-          if (deal.deal_state === dealState.PAID) {
-            if (user_id !== deal.seller_id)
-              throw new Forbidden(messages.auth.forbidden)
-            res.success({
-              message: messages.deal.deal_sending,
-              data: await dealModule.update({deal_id, deal_state})
-            })
-
-            let buyer = await userModule.getUserInfo({user_id: deal.buyer_id})
-            let user_fcm_token = buyer.fcm_tokens
-            if (user_fcm_token && user_fcm_token.length > 0)
-              await notifyModule.send({
-                notify_detail_id: deal_id,
-                notify_type: 'deal',
-                title: 'Đang giao hàng',
-                message: `Mặt hàng "${deal.title}" đang được giao đến người mua`,
-                user_fcm_token: buyer.fcm_tokens
-              })
-            return
-          } else {
-            throw new GeneralError(messages.deal.deal_not_paid)
-          }
-        } else {
-          if (deal.deal_state === dealState.CONFIRMED) {
-            if (user_id !== deal.seller_id)
-              throw new Forbidden(messages.auth.forbidden)
-            res.success({
-              message: messages.deal.deal_sending,
-              data: await dealModule.update({deal_id, deal_state})
-            })
-
-            let buyer = await userModule.getUserInfo({user_id: deal.buyer_id})
-            let user_fcm_token = buyer.fcm_tokens
-            if (user_fcm_token && user_fcm_token.length > 0)
-              await notifyModule.send({
-                notify_detail_id: deal_id,
-                notify_type: 'deal',
-                title: 'Đang giao hàng',
-                message: `Mặt hàng "${deal.title}" đang được giao đến người mua`,
-                user_fcm_token: buyer.fcm_tokens
-              })
-            return
-          } else {
-            throw new GeneralError(messages.deal.deal_not_confirmed)
-          }
-        }
-      }
-      case dealState.RECEIVED: {
-        if (deal.deal_state === dealState.SENDING) {
+      case dealState.DELIVERED: {
+        if (deal.deal_state === dealState.DELIVERING) {
           if (user_id !== deal.buyer_id)
             throw new Forbidden(messages.auth.forbidden)
-          res.success({
-            message: messages.deal.deal_received,
-            data: await dealModule.update({deal_id, deal_state})
-          })
-
+          let data = await dealModule.update({deal_id, deal_state})
           let seller = await userModule.getUserInfo({user_id: deal.seller_id})
           let user_fcm_token = seller.fcm_tokens
           if (user_fcm_token && user_fcm_token.length > 0)
@@ -254,20 +240,51 @@ dealController.updateDealState = async (req, res, next) => {
               message: `Mặt hàng "${deal.title}" đã được giao thành công tới người mua`,
               user_fcm_token: seller.fcm_tokens
             })
+          res.success({
+            message: messages.deal.deal_delivered,
+            data: data
+          })
+
           return
         } else {
-          throw new GeneralError(messages.deal.deal_not_send)
+          throw new GeneralError(messages.deal.deal_not_delivering)
+        }
+      }
+      case dealState.DENIED: {
+        if (deal.deal_state === dealState.DELIVERING) {
+          if (user_id !== deal.buyer_id)
+            throw new Forbidden(messages.auth.forbidden)
+          let data = await dealModule.update({deal_id, deal_state})
+          await postModule.update({
+            post_id: deal.post_id,
+            post_state: postState.ACTIVE
+          })
+
+          let seller = await userModule.getUserInfo({user_id: deal.seller_id})
+          let user_fcm_token = seller.fcm_tokens
+          if (user_fcm_token && user_fcm_token.length > 0)
+            await notifyModule.send({
+              notify_detail_id: deal_id,
+              notify_type: 'deal',
+              title: 'Giao dịch thất bại',
+              message: `Mặt hàng "${deal.title}" đã bị người mua từ chối nhận`,
+              user_fcm_token: seller.fcm_tokens
+            })
+          res.success({
+            message: messages.deal.deal_denied,
+            data: data
+          })
+
+          return
+        } else {
+          throw new GeneralError(messages.deal.deal_not_delivering)
         }
       }
       case dealState.DONE: {
-        if (deal.deal_state === dealState.RECEIVED) {
+        if (deal.deal_state === dealState.DELIVERED) {
           if (user_id !== deal.buyer_id)
             throw new Forbidden(messages.auth.forbidden)
-          res.success({
-            message: messages.deal.deal_done,
-            data: await dealModule.update({deal_id, deal_state})
-          })
-
+          let data = await dealModule.update({deal_id, deal_state})
           let seller = await userModule.getUserInfo({user_id: deal.seller_id})
           let user_fcm_token = seller.fcm_tokens
           if (user_fcm_token && user_fcm_token.length > 0)
@@ -278,6 +295,11 @@ dealController.updateDealState = async (req, res, next) => {
               message: `Giao dịch mặt hàng "${deal.title}" đã được đánh giá bởi người mua`,
               user_fcm_token: seller.fcm_tokens
             })
+          res.success({
+            message: messages.deal.deal_done,
+            data: data
+          })
+
           return
         } else {
           throw new GeneralError(messages.deal.deal_not_received)
@@ -287,6 +309,7 @@ dealController.updateDealState = async (req, res, next) => {
         throw new GeneralError(messages.deal.state_incorrect)
     }
   } catch (e) {
+    console.log(e)
     next(e)
   }
 }
@@ -302,7 +325,7 @@ dealController.rateDeal = async (req, res, next) => {
       throw new Forbidden(messages.deal.rate_forbidden)
     if (deal.deal_state === dealState.DONE)
       throw new GeneralError(messages.deal.deal_done)
-    if (deal.deal_state !== dealState.RECEIVED)
+    if (deal.deal_state !== dealState.DELIVERED)
       throw new GeneralError(messages.deal.can_not_rate)
     if (!rate_numb) throw new BadRequest(messages.deal.rate_numb_required)
     if (!rate_content) throw new BadRequest(messages.deal.rate_content_required)
@@ -310,11 +333,16 @@ dealController.rateDeal = async (req, res, next) => {
     let rate = await dealModule.rateDeal({deal_id, rate_numb, rate_content})
     if (rate) await dealModule.update({deal_id, deal_state: dealState.DONE})
 
-    let seller = await dealModule.getSeller({deal_id})
+    let seller = await userModule.getUserInfo({user_id: deal.seller_id})
+
+    let rateState = await dealModule.getUserRateStat({user_id: seller.user_id})
     if (seller) {
       let new_user_rating =
-        (seller.rating * (seller.rate_count - 1) + rate.rate_numb) /
-        seller.rate_count
+        rateState.rate_count !== 0
+          ? rateState.rate_sum / rateState.rate_count
+          : 0
+
+      console.log([new_user_rating, rateState])
       new_user_rating = new_user_rating.toFixed(1)
       seller.rating = Number(new_user_rating)
       await userModule.updateRating({

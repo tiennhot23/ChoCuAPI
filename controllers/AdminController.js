@@ -150,7 +150,7 @@ adminController.denyPost = async (req, res, next) => {
       return res.success({
         message: messages.post.post_not_pending
       })
-    let data = await postModule.delete({post_id})
+    let data = await postModule.update({post_id, post_state: postState.DENIED})
     if (data) {
       let seller = await userModule.getUserInfo({user_id: post.seller_id})
       if (seller?.fcm_tokens && seller?.fcm_tokens.length > 0) {
@@ -158,7 +158,7 @@ adminController.denyPost = async (req, res, next) => {
           notify_detail_id: post_id,
           notify_type: 'post',
           title: 'Tin đã bị từ chối',
-          message: `Tin "${post.title}" đã bị từ chối`,
+          message: `Tin "${post.title}" đã bị từ chối.\n${reason}`,
           user_fcm_token: seller.fcm_tokens
         })
       }
@@ -174,12 +174,12 @@ adminController.denyPost = async (req, res, next) => {
   }
 }
 
-adminController.deletePost = async (req, res, next) => {
+adminController.lockPost = async (req, res, next) => {
   let {post_id} = req.params
   try {
     let post = await postModule.getPost({post_id})
     if (!post) throw new NotFound(messages.post.not_found)
-    let data = await postModule.update({post_id, post_state: postState.DELETED})
+    let data = await postModule.update({post_id, post_state: postState.LOCKED})
     if (data) {
       await reportModule.removePostReports({post_id})
       let user = await userModule.getUserInfo({user_id: post.seller_id})
