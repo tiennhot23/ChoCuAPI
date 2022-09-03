@@ -389,4 +389,28 @@ userModule.increasePostTurn = ({user_id, extra_post_turn}) => {
   })
 }
 
+userModule.getUserRevenueStat = ({
+  user_id,
+  fromDate = '1990-01-01',
+  toDate = `${
+    new Date().getFullYear() +
+    '-' +
+    ('0' + (new Date().getMonth() + 1)).slice(-2) +
+    '-' +
+    ('0' + new Date().getDate()).slice(-2)
+  }`
+}) => {
+  return new Promise((resolve, reject) => {
+    let query = `select d.time_created::date, sum(p.default_price) as price_sum from "Deal" d left join "Post" p on d.post_id = p.post_id
+    where p.seller_id = $1 and d.time_created >= $2 and d.time_created <= $3
+    group by d.time_created::date order by time_created desc`
+    let params = [user_id, fromDate, toDate]
+
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows)
+    })
+  })
+}
+
 module.exports = userModule

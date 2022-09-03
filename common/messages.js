@@ -153,7 +153,7 @@ module.exports = {
   constraint: {
     username_unique: 'Tên đăng nhập/số điên thoại đã được sử dụng',
     cate_fk: 'Danh mục này đã được sử dụng trong một bài đăng khác',
-    details_fk: 'Chi tiết này đã được sử dụng trong một bài đăng khác',
+    details_fk: 'Chi tiết này đã được sử dụng trong một danh mục',
     account_role_fk: 'Không tìm thấy quyền tài khoản này'
   },
   common: {

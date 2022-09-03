@@ -125,4 +125,28 @@ dealModule.getUserRateStat = ({user_id}) => {
   })
 }
 
+dealModule.getUserSellDealStat = ({user_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `select deal_state, count(deal_state) from "Deal" d left join "Post" p on d.post_id = p.post_id
+    where p.seller_id = $1 group by deal_state`
+    let params = [user_id]
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows)
+    })
+  })
+}
+
+dealModule.getUserBuyDealStat = ({user_id}) => {
+  return new Promise((resolve, reject) => {
+    let query = `select deal_state, count(deal_state) from "Deal" d
+    where d.buyer_id = $1 group by deal_state`
+    let params = [user_id]
+    conn.query(query, params, (err, res) => {
+      if (err) return reject(err)
+      else return resolve(res.rows)
+    })
+  })
+}
+
 module.exports = dealModule

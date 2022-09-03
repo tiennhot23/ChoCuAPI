@@ -70,4 +70,8 @@ user.post(
   userController.unsubcribeNotify
 )
 
+user.post('/revenue-stat', auth.verifyUser, userController.getUserRevenueStat)
+
+user.get('/user-deal-stat/:user_id', userController.getUserStat)
+
 module.exports = user

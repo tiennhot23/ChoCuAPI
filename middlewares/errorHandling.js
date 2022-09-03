@@ -21,7 +21,7 @@ const errorHandling = (err, req, res, next) => {
           data: []
         })
       }
-      case 'cate_fk': {
+      case 'category_fk': {
         return res.json({
           status: 'error',
           code: 500,

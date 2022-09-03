@@ -4,7 +4,8 @@ const {
   otpModule,
   userModule,
   fileModule,
-  servicesModule
+  servicesModule,
+  dealModule
 } = require('../modules')
 const {
   BadRequest,
@@ -259,6 +260,58 @@ userController.unsubcribeNotify = async (req, res, next) => {
           })
         }
       ]
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
+userController.getUserRevenueStat = async (req, res, next) => {
+  let {user_id} = req.user
+  let {fromDate, toDate} = req.body
+  try {
+    res.success({
+      data: await userModule.getUserRevenueStat({user_id, fromDate, toDate})
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
+userController.getUserStat = async (req, res, next) => {
+  let {user_id} = req.params
+  try {
+    let rateStat = await dealModule.getUserRateStat({user_id})
+    let sellDealStat = await dealModule.getUserSellDealStat({user_id})
+    let successSellDealCount = 0
+    sellDealStat.map((e) => {
+      if (['done', 'delivered'].includes(e.deal_state))
+        successSellDealCount += Number(e.count)
+    })
+
+    let buyDealStat = await dealModule.getUserBuyDealStat({user_id})
+    let successBuyDealCount = 0
+    let deniedBuyDealCount = 0
+    buyDealStat.map((e) => {
+      if (['done', 'delivered'].includes(e.deal_state))
+        successBuyDealCount += Number(e.count)
+      if (['denied'].includes(e.deal_state))
+        deniedBuyDealCount += Number(e.count)
+    })
+
+    res.success({
+      data: {
+        rating: Number(
+          (Number(rateStat.rate_count) !== 0
+            ? Number(rateStat.rate_sum) / Number(rateStat.rate_count)
+            : 0
+          ).toFixed(1)
+        ),
+        rate_count: Number(rateStat.rate_count),
+        success_sell_deal_count: successSellDealCount,
+        success_buy_deal_count: successBuyDealCount,
+        denied_buy_deal_count: deniedBuyDealCount
+      }
     })
   } catch (e) {
     next(e)
