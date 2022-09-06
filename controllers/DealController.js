@@ -142,6 +142,10 @@ dealController.updateDealState = async (req, res, next) => {
           if (user_id !== deal.seller_id)
             throw new Forbidden(messages.auth.forbidden)
           let data = await dealModule.update({deal_id, deal_state})
+          await postModule.update({
+            post_id: deal.post_id,
+            post_state: postState.ACTIVE
+          })
           let buyer = await userModule.getUserInfo({user_id: deal.buyer_id})
           let seller = await userModule.getUserInfo({user_id: deal.seller_id})
           let user_fcm_token =

@@ -225,7 +225,7 @@ postModule.update = ({
       query += ` description=$${num++},`
       params.push(description)
     }
-    if (online_payment) {
+    if (online_payment !== null && online_payment !== undefined) {
       query += ` online_payment=$${num++},`
       params.push(online_payment)
     }

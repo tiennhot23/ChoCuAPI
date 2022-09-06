@@ -52,11 +52,11 @@ adminController.getAllUser = async (req, res, next) => {
 }
 
 adminController.getServicesRevenue = async (req, res, next) => {
-  const {month, year} = req.body
+  const {year} = req.body
   try {
-    console.log(await servicesModule.getUserBuyServices({month, year}))
+    console.log(await servicesModule.getUserBuyServices({year}))
     return res.success({
-      data: await servicesModule.getUserBuyServices({month, year})
+      data: await servicesModule.getUserBuyServices({year})
     })
   } catch (e) {
     next(e)
@@ -146,9 +146,12 @@ adminController.denyPost = async (req, res, next) => {
   try {
     let post = await postModule.getPost({post_id})
     if (!post) throw new NotFound(messages.post.not_found)
-    if (post.post_state !== postState.PENDING)
+    if (
+      post.post_state !== postState.PENDING &&
+      post.post_state !== postState.ACTIVE
+    )
       return res.success({
-        message: messages.post.post_not_pending
+        message: 'Bài đăng không ở trạng thái đang đăng hay đang chờ duyệt'
       })
     let data = await postModule.update({post_id, post_state: postState.DENIED})
     if (data) {
@@ -163,7 +166,11 @@ adminController.denyPost = async (req, res, next) => {
         })
       }
       if (seller?.email && seller?.email !== 'Chưa cung cấp')
-        mail.sendMail(seller?.email, '[TIN ĐĂNG BỊ TỪ CHỐI PHÊ DUYỆT]', reason)
+        mail.sendMail(
+          seller?.email,
+          '[TIN ĐĂNG BỊ TỪ CHỐI PHÊ DUYỆT]',
+          `Tin "${post.title}" đã bị từ chối.\nLí do: ${reason}`
+        )
     }
     res.success({
       message: messages.post.post_denied,
@@ -229,7 +236,11 @@ adminController.lockAccount = async (req, res, next) => {
           })
         }
         if (user?.email && user?.email !== 'Chưa cung cấp')
-          mail.sendMail(user?.email, '[THÔNG BÁO KHOÁ TÀI KHOẢN]', reason)
+          mail.sendMail(
+            user?.email,
+            '[THÔNG BÁO KHOÁ TÀI KHOẢN]',
+            `Tài khoản của bạn đã bị khoá chức năng đăng bài, kể từ giờ bạn không thể đăng bất kì bài nào.\nLí do: ${reason}`
+          )
       }
     }
 

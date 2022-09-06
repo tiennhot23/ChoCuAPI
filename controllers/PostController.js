@@ -200,8 +200,10 @@ controller.editPost = async (req, res, next) => {
   try {
     let post = await postModule.getPost({post_id})
     let isPostActive =
-      post.post_state !== postState.DENIED ||
+      post.post_state !== postState.DENIED &&
       post.post_state !== postState.PENDING
+    console.log(isPostActive)
+    console.log(req.body)
     if (!post) throw new NotFound(messages.post.not_found)
     if (post.post_state === postState.LOCKED)
       throw new GeneralError(messages.post.post_deleted)
